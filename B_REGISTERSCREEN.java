@@ -133,10 +133,9 @@ public class B_RegisterScreen extends JFrame {
 					JOptionPane.showMessageDialog(null, "La contraseña debe tener al menos 6 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				
+				// Creamos la hashedPassword como la que ha creado 
 				 String hashedPassword = hashPassword(pass1);
-
-
-
 
 
 				//Entro a la conexión de la BDD local
