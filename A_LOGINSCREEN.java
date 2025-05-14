@@ -79,7 +79,7 @@ public class A_LoginScreen extends JFrame {
 		
 		JLabel lblnoTienesCuenta = new JLabel("¿No tienes cuenta?");
 		lblnoTienesCuenta.setForeground(new Color(0, 0, 0));
-		lblnoTienesCuenta.setBounds(72, 233, 120, 17);
+		lblnoTienesCuenta.setBounds(55, 202, 120, 17);
 		contentPane.add(lblnoTienesCuenta);
 		
 		JButton btnCrearCuenta = new JButton("Crear cuenta");
@@ -93,20 +93,6 @@ public class A_LoginScreen extends JFrame {
 		});
 		btnCrearCuenta.setBounds(210, 228, 141, 27);
 		contentPane.add(btnCrearCuenta);
-		
-		JLabel lblhasOlvidadoTu = new JLabel("¿Has olvidado tu contraseña?");
-		lblhasOlvidadoTu.setForeground(new Color(0, 153, 255));
-		lblhasOlvidadoTu.setBounds(23, 180, 183, 17);
-		contentPane.add(lblhasOlvidadoTu);
-		
-		JButton btnRecuperarContrasea = new JButton("Recuperar contraseña");
-		btnRecuperarContrasea.setForeground(new Color(0, 0, 0));
-		btnRecuperarContrasea.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnRecuperarContrasea.setBounds(210, 175, 164, 27);
-		contentPane.add(btnRecuperarContrasea);
 		
 		JLabel lblLogin = new JLabel("LOGIN");
 		lblLogin.setForeground(new Color(0, 0, 0));
