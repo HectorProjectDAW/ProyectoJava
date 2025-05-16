@@ -143,6 +143,7 @@ public class A_LoginScreen extends JFrame {
 					} catch (Exception ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(null, "Error al iniciar sesión.");
+					 return;
 					}
 				
 				 
