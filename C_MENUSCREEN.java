@@ -42,6 +42,14 @@ public class C_MenuPrincipalScreen extends JFrame {
 		btnPartidaNueva.setForeground(Color.BLACK);
 		btnPartidaNueva.setBounds(160, 40, 180, 30);
 		contentPane.add(btnPartidaNueva);
+		btnPartidaNueva.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	D_SelectorTemasScreen selecTema = new D_SelectorTemasScreen();
+		    	selecTema.setVisible(true);
+		    	dispose();
+		    }
+		});
+		
 
 		JButton btnContinuarPartida = new JButton("Continuar partida");
 		btnContinuarPartida.setForeground(Color.BLACK);
