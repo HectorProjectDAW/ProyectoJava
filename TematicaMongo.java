@@ -16,7 +16,7 @@ public class TematicaMongo {
         List<String> lista = new ArrayList<>();
 
        
-        String uri = "mongodb://root:alumnoalumno@localhost:27017";
+        String uri = "mongodb://root:alumnoalumno@localhost:27017/";
 
        
         try (MongoClient mongoClient = MongoClients.create(uri)) {
