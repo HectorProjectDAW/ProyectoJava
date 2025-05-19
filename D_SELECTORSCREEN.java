@@ -141,7 +141,7 @@ public class D_SelectorTemasScreen extends JFrame {
             });
         }
 
-        //Salir
+        
         JButton btnSalirAlMen = new JButton("Salir al menú");
         btnSalirAlMen.addActionListener(e -> {
             C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
