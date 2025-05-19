@@ -91,7 +91,7 @@ public class A_LoginScreen extends JFrame {
 				dispose();
 			}
 		});
-		btnCrearCuenta.setBounds(210, 228, 141, 27);
+		btnCrearCuenta.setBounds(193, 197, 141, 27);
 		contentPane.add(btnCrearCuenta);
 		
 		JLabel lblLogin = new JLabel("LOGIN");
