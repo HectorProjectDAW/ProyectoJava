@@ -134,7 +134,7 @@ public class B_RegisterScreen extends JFrame {
 					return;
 				}
 				
-				// Creamos la hashedPassword como la que ha creado 
+				// Creamos la hashedPassword como la que ha creado el user
 				 String hashedPassword = hashPassword(pass1);
 
 
