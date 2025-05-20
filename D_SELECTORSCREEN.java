@@ -21,7 +21,7 @@ public class D_SelectorTemasScreen extends JFrame {
     protected JButton btnTema1, btnTema2, btnTema3;
     protected JLabel lblTema1, lblTema2, lblTema3;
 
-    private String convertirNombreArchivo(String tematica) {
+    private String convertirImg(String tematica) {
         String nombre = tematica.toLowerCase()
             .replace("á", "a").replace("é", "e").replace("í", "i")
             .replace("ó", "o").replace("ú", "u").replace("ñ", "n")
@@ -107,15 +107,18 @@ public class D_SelectorTemasScreen extends JFrame {
         JButton[] botones = { btnTema1, btnTema2, btnTema3 };
         JLabel[] etiquetas = { lblTema1, lblTema2, lblTema3 };
 
+        //Recorrer lista tematicas
         for (int i = 0; i < tematicas.size(); i++) {
+        	//Obtiene el tema
             String tema = tematicas.get(i);
+            //Qiotar border, ponerlo en el area correcta
             botones[i].setBorderPainted(false);
             botones[i].setContentAreaFilled(false);
             etiquetas[i].setText(tema);
             ajustarEtiqueta(etiquetas[i], tema);
 
             // Buscar imagen
-            String ruta = "/img/" + convertirNombreArchivo(tema);
+            String ruta = "/img/" + convertirImg(tema);
             
             //Buscar imagen dentro del proyecto
             java.net.URL imgUrl = getClass().getResource(ruta);
@@ -139,6 +142,7 @@ public class D_SelectorTemasScreen extends JFrame {
                 juego.setVisible(true);
                 dispose();
             });
+            
         }
 
         
