@@ -20,7 +20,6 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.SystemColor;
 
-
 public class A_LoginScreen extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -57,31 +56,31 @@ public class A_LoginScreen extends JFrame {
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		JLabel lblCorreoElectrnico = new JLabel("Correo electrónico:");
-		lblCorreoElectrnico.setForeground(new Color(0, 0, 0));
-		lblCorreoElectrnico.setBounds(55, 67, 120, 17);
-		contentPane.add(lblCorreoElectrnico);
-		
+
+		JLabel lblUsuario = new JLabel("Nombre de usuario:");
+		lblUsuario.setForeground(new Color(0, 0, 0));
+		lblUsuario.setBounds(55, 67, 120, 17);
+		contentPane.add(lblUsuario);
+
 		textField = new JTextField();
 		textField.setBounds(193, 65, 201, 21);
 		contentPane.add(textField);
 		textField.setColumns(10);
-		
+
 		JLabel lblContrasea = new JLabel("Contraseña:");
 		lblContrasea.setForeground(new Color(0, 0, 0));
 		lblContrasea.setBounds(55, 96, 120, 17);
 		contentPane.add(lblContrasea);
-		
+
 		passwordField = new JPasswordField();
 		passwordField.setBounds(193, 94, 201, 21);
 		contentPane.add(passwordField);
-		
+
 		JLabel lblnoTienesCuenta = new JLabel("¿No tienes cuenta?");
 		lblnoTienesCuenta.setForeground(new Color(0, 0, 0));
 		lblnoTienesCuenta.setBounds(55, 202, 120, 17);
 		contentPane.add(lblnoTienesCuenta);
-		
+
 		JButton btnCrearCuenta = new JButton("Crear cuenta");
 		btnCrearCuenta.setForeground(new Color(0, 0, 0));
 		btnCrearCuenta.addActionListener(new ActionListener() {
@@ -93,60 +92,59 @@ public class A_LoginScreen extends JFrame {
 		});
 		btnCrearCuenta.setBounds(193, 197, 141, 27);
 		contentPane.add(btnCrearCuenta);
-		
+
 		JLabel lblLogin = new JLabel("LOGIN");
 		lblLogin.setForeground(new Color(0, 0, 0));
 		lblLogin.setFont(new Font("Dialog", Font.BOLD, 16));
 		lblLogin.setBounds(179, 12, 60, 17);
 		contentPane.add(lblLogin);
-		
+
 		JButton btnContinuar = new JButton("Continuar");
 		btnContinuar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				//Obtenemos correo y contraseña
-				String correo = textField.getText();
-				 String contrasenya = new String(passwordField.getPassword());
-				 
-				 //Si hay correo o contraseña en blanco sale Error
-				 if (correo .isEmpty() || contrasenya.isEmpty()) {
-					 JOptionPane.showMessageDialog(null, "Complete todos los campos porfavor");
-					 return;
-				 }
-				 String hashedPassword = hashPassword(contrasenya);
-				 
-				 //Intenta conexión con la BDD local
-				 try (Connection conexion = DriverManager.getConnection(
-							"jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
 
-					    //Hace Select para ver si el correo está en la BDD. Si la contraseña tmb es la misma, inicia sesión
-						String checkQuery = "SELECT * FROM Usuarios WHERE correo = ?";
-						try (PreparedStatement statement = conexion.prepareStatement(checkQuery)) {
-							statement.setString(1, correo);
-							try (ResultSet rs = statement.executeQuery()) {
-								if (rs.next()) {
-									
-									String contrasenyaBD = rs.getString("contrasenya");
-									if (hashedPassword.equals(contrasenyaBD)) {
-										JOptionPane.showMessageDialog(null, "¡Inicio de sesión exitoso!");
-								
-									} else {
-										JOptionPane.showMessageDialog(null, "Contraseña incorrecta.");
-										return;
-									}
+				//Obtenemos usuario y contrasenya
+				String usuario = textField.getText();
+				String contrasenya = new String(passwordField.getPassword());
+
+				//Si hay usuario o contrasenya en blanco sale Error
+				if (usuario.isEmpty() || contrasenya.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Complete todos los campos porfavor");
+					return;
+				}
+				String hashedPassword = hashPassword(contrasenya);
+
+				//Intenta conexion con la BDD local
+				try (Connection conexion = DriverManager.getConnection(
+						"jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
+
+					//Hace Select para ver si el usuario esta en la BDD Si la contrasenya tmb es la misma inicia sesion
+					String checkQuery = "SELECT * FROM Usuarios WHERE nombre_usuario = ?";
+					try (PreparedStatement statement = conexion.prepareStatement(checkQuery)) {
+						statement.setString(1, usuario);
+						try (ResultSet rs = statement.executeQuery()) {
+							if (rs.next()) {
+
+								String contrasenyaBD = rs.getString("contrasenya");
+								if (hashedPassword.equals(contrasenyaBD)) {
+									JOptionPane.showMessageDialog(null, "Inicio de sesion correcto");
+
 								} else {
-									JOptionPane.showMessageDialog(null, "Usuario no encontrado.");
+									JOptionPane.showMessageDialog(null, "Contrasenya incorrecta");
 									return;
 								}
+							} else {
+								JOptionPane.showMessageDialog(null, "Usuario no encontrado");
+								return;
 							}
 						}
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						JOptionPane.showMessageDialog(null, "Error al iniciar sesión.");
-					 return;
 					}
-				
-				 
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Error al iniciar sesion");
+					return;
+				}
+
 				C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
 				menu.setVisible(true);
 				dispose();
@@ -157,24 +155,25 @@ public class A_LoginScreen extends JFrame {
 		btnContinuar.setBounds(160, 130, 120, 27);
 		contentPane.add(btnContinuar);
 	}
+
 	private String hashPassword(String password) {
-	    try {
-	        // Crear el objeto con el algoritmo SHA-256
-	        MessageDigest md = MessageDigest.getInstance("SHA-256");
+		try {
+			// Crear el objeto con el algoritmo SHA256
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-	        // Generar el hash de la contraseña
-	        byte[] hashBytes = md.digest(password.getBytes());
+			// Generar el hash de la contrasenya
+			byte[] hashBytes = md.digest(password.getBytes());
 
-	        // Convertir el array de bytes a una cadena hexadecimal
-	        StringBuilder hexString = new StringBuilder();
-	        for (byte b : hashBytes) {
-	            hexString.append(String.format("%02x", b));
-	        }
+			// Convertir el array de bytes a una cadena hexadecimal
+			StringBuilder hexString = new StringBuilder();
+			for (byte b : hashBytes) {
+				hexString.append(String.format("%02x", b));
+			}
 
-	        return hexString.toString();
-	    } catch (NoSuchAlgorithmException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+			return hexString.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
