@@ -1,179 +1,114 @@
 package com.proyecto.mi_proyecto;
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.SystemColor;
+
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class A_LoginScreen extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					A_LoginScreen frame = new A_LoginScreen();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				A_LoginScreen frame = new A_LoginScreen();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public A_LoginScreen() {
-		setBackground(SystemColor.controlDkShadow);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		setSize(screenSize.width, screenSize.height);
+		setLocationRelativeTo(null);
+
+		JPanel contentPane = new JPanel(new GridBagLayout());
 		contentPane.setBackground(Color.LIGHT_GRAY);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
 
-		JLabel lblUsuario = new JLabel("Nombre de usuario:");
-		lblUsuario.setForeground(new Color(0, 0, 0));
-		lblUsuario.setBounds(55, 67, 120, 17);
-		contentPane.add(lblUsuario);
-
-		textField = new JTextField();
-		textField.setBounds(193, 65, 201, 21);
-		contentPane.add(textField);
-		textField.setColumns(10);
-
-		JLabel lblContrasea = new JLabel("Contraseña:");
-		lblContrasea.setForeground(new Color(0, 0, 0));
-		lblContrasea.setBounds(55, 96, 120, 17);
-		contentPane.add(lblContrasea);
-
-		passwordField = new JPasswordField();
-		passwordField.setBounds(193, 94, 201, 21);
-		contentPane.add(passwordField);
-
-		JLabel lblnoTienesCuenta = new JLabel("¿No tienes cuenta?");
-		lblnoTienesCuenta.setForeground(new Color(0, 0, 0));
-		lblnoTienesCuenta.setBounds(55, 202, 120, 17);
-		contentPane.add(lblnoTienesCuenta);
-
-		JButton btnCrearCuenta = new JButton("Crear cuenta");
-		btnCrearCuenta.setForeground(new Color(0, 0, 0));
-		btnCrearCuenta.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				B_RegisterScreen registerScreen = new B_RegisterScreen();
-				registerScreen.setVisible(true);
-				dispose();
-			}
-		});
-		btnCrearCuenta.setBounds(193, 197, 141, 27);
-		contentPane.add(btnCrearCuenta);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(10, 10, 10, 10);
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
 
 		JLabel lblLogin = new JLabel("LOGIN");
-		lblLogin.setForeground(new Color(0, 0, 0));
-		lblLogin.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblLogin.setBounds(179, 12, 60, 17);
-		contentPane.add(lblLogin);
+		lblLogin.setFont(new Font("Dialog", Font.BOLD, 26));
+		lblLogin.setForeground(Color.BLACK);
+		contentPane.add(lblLogin, gbc);
 
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		JLabel lblUsuario = new JLabel("Nombre de usuario:");
+		lblUsuario.setFont(new Font("Dialog", Font.PLAIN, 16));
+		contentPane.add(lblUsuario, gbc);
+
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		textField = new JTextField(20);
+		contentPane.add(textField, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		JLabel lblContrasena = new JLabel("Contraseña:");
+		lblContrasena.setFont(new Font("Dialog", Font.PLAIN, 16));
+		contentPane.add(lblContrasena, gbc);
+
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		passwordField = new JPasswordField(20);
+		contentPane.add(passwordField, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
 		JButton btnContinuar = new JButton("Continuar");
-		btnContinuar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnContinuar.addActionListener(this::loginAction);
+		contentPane.add(btnContinuar, gbc);
 
-				//Obtenemos usuario y contrasenya
-				String usuario = textField.getText();
-				String contrasenya = new String(passwordField.getPassword());
+		gbc.gridy = 4;
+		JLabel lblNoTienesCuenta = new JLabel("¿No tienes cuenta?");
+		contentPane.add(lblNoTienesCuenta, gbc);
 
-				//Si hay usuario o contrasenya en blanco sale Error
-				if (usuario.isEmpty() || contrasenya.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Complete todos los campos porfavor");
-					return;
-				}
-				String hashedPassword = hashPassword(contrasenya);
-
-				//Intenta conexion con la BDD local
-				try (Connection conexion = DriverManager.getConnection(
-						"jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
-
-					//Hace Select para ver si el usuario esta en la BDD Si la contrasenya tmb es la misma inicia sesion
-					String checkQuery = "SELECT * FROM Usuarios WHERE nombre_usuario = ?";
-					try (PreparedStatement statement = conexion.prepareStatement(checkQuery)) {
-						statement.setString(1, usuario);
-						try (ResultSet rs = statement.executeQuery()) {
-							if (rs.next()) {
-
-								String contrasenyaBD = rs.getString("contrasenya");
-								if (hashedPassword.equals(contrasenyaBD)) {
-									JOptionPane.showMessageDialog(null, "Inicio de sesion correcto");
-
-								} else {
-									JOptionPane.showMessageDialog(null, "Contrasenya incorrecta");
-									return;
-								}
-							} else {
-								JOptionPane.showMessageDialog(null, "Usuario no encontrado");
-								return;
-							}
-						}
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Error al iniciar sesion");
-					return;
-				}
-
-				C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
-				menu.setVisible(true);
-				dispose();
-			}
+		gbc.gridy = 5;
+		JButton btnCrearCuenta = new JButton("Crear cuenta");
+		btnCrearCuenta.addActionListener(e -> {
+			B_RegisterScreen registerScreen = new B_RegisterScreen();
+			registerScreen.setVisible(true);
+			dispose();
 		});
-		btnContinuar.setForeground(new Color(0, 0, 0));
-		btnContinuar.setBackground(new Color(204, 204, 204));
-		btnContinuar.setBounds(160, 130, 120, 27);
-		contentPane.add(btnContinuar);
+		contentPane.add(btnCrearCuenta, gbc);
 	}
 
-	private String hashPassword(String password) {
-		try {
-			// Crear el objeto con el algoritmo SHA256
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
+	private void loginAction(ActionEvent e) {
+		String usuario = textField.getText();
+		String contrasenya = new String(passwordField.getPassword());
 
-			// Generar el hash de la contrasenya
-			byte[] hashBytes = md.digest(password.getBytes());
+		if (usuario.isEmpty() || contrasenya.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Complete todos los campos por favor");
+			return;
+		}
 
-			// Convertir el array de bytes a una cadena hexadecimal
-			StringBuilder hexString = new StringBuilder();
-			for (byte b : hashBytes) {
-				hexString.append(String.format("%02x", b));
-			}
+		if (!User.existeUsuario(usuario)) {
+			JOptionPane.showMessageDialog(this, "Usuario no encontrado");
+			return;
+		}
 
-			return hexString.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return null;
+		if (User.validarCredenciales(usuario, contrasenya)) {
+			JOptionPane.showMessageDialog(this, "Inicio de sesión correcto");
+			C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
+			menu.setVisible(true);
+			dispose();
+		} else {
+			JOptionPane.showMessageDialog(this, "Contraseña incorrecta");
 		}
 	}
 }
