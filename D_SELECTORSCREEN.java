@@ -6,7 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.EventQueue;
 import java.util.List;
-
+import com.proyecto.mi_proyecto.*;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,14 +30,10 @@ public class D_SelectorTemasScreen extends JFrame {
     }
 
     private void ajustarEtiqueta(JLabel etiqueta, String texto) {
-    	//Fuente del Label
         Font fuente = etiqueta.getFont();
-        //Saber cuanto ocupa el texto
         FontMetrics fm = etiqueta.getFontMetrics(fuente);
-        //Ancho texto y alto para la etiqueta
         int textoWidth = fm.stringWidth(texto);
         int width = etiqueta.getWidth();
-        //Si el texto es mas grande que la etiqueta, disminuye tamaño
         if (textoWidth > width) {
             int newSize = fuente.getSize() - 1;
             while (newSize > 8 && fm.stringWidth(texto) > width) {
@@ -45,7 +41,6 @@ public class D_SelectorTemasScreen extends JFrame {
                 fm = etiqueta.getFontMetrics(fuente);
                 newSize--;
             }
-            //Se aplica el nuevo texto
             etiqueta.setFont(fuente);
         }
     }
@@ -62,97 +57,94 @@ public class D_SelectorTemasScreen extends JFrame {
     }
 
     public D_SelectorTemasScreen() {
+        // Pantalla completa
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 550, 350);
         setTitle("Selector de Temáticas");
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(192, 192, 192));
-        contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+        contentPane.setBackground(new Color(240, 240, 240));
+        contentPane.setBorder(new EmptyBorder(20, 20, 20, 20));
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        JLabel lblTitulo = new JLabel("Selecciona la temática");
-        lblTitulo.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblTitulo.setBounds(155, 20, 250, 30);
+        // Título centrado
+        JLabel lblTitulo = new JLabel("Selecciona la temática", JLabel.CENTER);
+        lblTitulo.setFont(new Font("Dialog", Font.BOLD, 32));
+        lblTitulo.setBounds(0, 30, getWidth(), 40);
         contentPane.add(lblTitulo);
 
-        
+        // Crear botones y etiquetas
         btnTema1 = new JButton();
-        btnTema1.setBounds(29, 64, 150, 169);
-        contentPane.add(btnTema1);
-
-        lblTema1 = new JLabel("", JLabel.CENTER);
-        lblTema1.setBounds(50, 240, 150, 20);
-        contentPane.add(lblTema1);
-
         btnTema2 = new JButton();
-        btnTema2.setBounds(200, 62, 150, 169);
-        contentPane.add(btnTema2);
-
-        lblTema2 = new JLabel("", JLabel.CENTER);
-        lblTema2.setBounds(210, 240, 150, 20);
-        contentPane.add(lblTema2);
-
         btnTema3 = new JButton();
-        btnTema3.setBounds(370, 64, 150, 169);
-        contentPane.add(btnTema3);
-
+        lblTema1 = new JLabel("", JLabel.CENTER);
+        lblTema2 = new JLabel("", JLabel.CENTER);
         lblTema3 = new JLabel("", JLabel.CENTER);
-        lblTema3.setBounds(370, 240, 150, 20);
-        contentPane.add(lblTema3);
 
-        //Tematicas de tematicamongo.java. Hacer arrays 
-        List<String> tematicas = TematicaMongo.Temas(3);
         JButton[] botones = { btnTema1, btnTema2, btnTema3 };
         JLabel[] etiquetas = { lblTema1, lblTema2, lblTema3 };
 
-        //Recorrer lista tematicas
+        // Posiciones centradas horizontalmente
+        int anchoBoton = 200;
+        int altoBoton = 220;
+        int espacio = 60;
+        int totalAncho = 3 * anchoBoton + 2 * espacio;
+        int xInicial = (getToolkit().getScreenSize().width - totalAncho) / 2;
+        int yBotones = 120;
+        int yEtiquetas = yBotones + altoBoton + 10;
+
+        // Temáticas
+        List<String> tematicas = TematicaMongo.Temas(3);
+
         for (int i = 0; i < tematicas.size(); i++) {
-        	//Obtiene el tema
             String tema = tematicas.get(i);
-            //Qiotar border, ponerlo en el area correcta
+
+            // Posicionar botones y etiquetas
+            int x = xInicial + i * (anchoBoton + espacio);
+            botones[i].setBounds(x, yBotones, anchoBoton, altoBoton);
             botones[i].setBorderPainted(false);
             botones[i].setContentAreaFilled(false);
-            etiquetas[i].setText(tema);
-            ajustarEtiqueta(etiquetas[i], tema);
+            contentPane.add(botones[i]);
 
-            // Buscar imagen
+            etiquetas[i].setText(tema);
+            etiquetas[i].setBounds(x, yEtiquetas, anchoBoton, 30);
+            etiquetas[i].setFont(new Font("Dialog", Font.BOLD, 18));
+            ajustarEtiqueta(etiquetas[i], tema);
+            contentPane.add(etiquetas[i]);
+
+            // Buscar imagen dentro del proyecto
             String ruta = "/img/" + convertirImg(tema);
-            
-            //Buscar imagen dentro del proyecto
             java.net.URL imgUrl = getClass().getResource(ruta);
             if (imgUrl != null) {
-            	
-            	//Crear icono a partir de la imagen
                 ImageIcon iconoOriginal = new ImageIcon(imgUrl);
-                
-                //Escalar imagen para que salga como el boton
                 Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(
-                        botones[i].getWidth(), botones[i].getHeight(), Image.SCALE_SMOOTH);
+                    botones[i].getWidth(), botones[i].getHeight(), Image.SCALE_SMOOTH);
                 botones[i].setIcon(new ImageIcon(imagenEscalada));
             } else {
                 System.err.println("No se encontró la imagen: " + ruta);
             }
 
-            // Acción del botón
+            // Acción al hacer clic
             botones[i].addActionListener(e -> {
-            	// Crear ventana del juego pasando la temática seleccionada
                 E_JuegoScreen juego = new E_JuegoScreen(tema);
                 juego.setVisible(true);
                 dispose();
             });
-            
         }
 
-        
+        // Botón volver al menú principal, centrado
         JButton btnSalirAlMen = new JButton("Salir al menú");
+        btnSalirAlMen.setFont(new Font("Dialog", Font.PLAIN, 18));
+        int anchoSalir = 200;
+        int altoSalir = 40;
+        btnSalirAlMen.setBounds((getToolkit().getScreenSize().width - anchoSalir) / 2,
+                                yEtiquetas + 60, anchoSalir, altoSalir);
         btnSalirAlMen.addActionListener(e -> {
             C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
             menu.setVisible(true);
             dispose();
         });
-        btnSalirAlMen.setBounds(200, 280, 140, 30);
         contentPane.add(btnSalirAlMen);
     }
 }
