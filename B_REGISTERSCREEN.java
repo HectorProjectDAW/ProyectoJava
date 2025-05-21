@@ -1,224 +1,149 @@
 package com.proyecto.mi_proyecto;
-import java.awt.EventQueue;
-import java.awt.Font;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Color;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class B_RegisterScreen extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField correoField;
-	private JPasswordField passwordField;
-	private JPasswordField repeat_passwordField;
-	private JTextField nombreUsuarioField; //nuevo campo para nombre_usuario
+    private static final long serialVersionUID = 1L;
+    private JTextField correoField;
+    private JPasswordField passwordField;
+    private JPasswordField repeatPasswordField;
+    private JTextField nombreUsuarioField;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					B_RegisterScreen frame = new B_RegisterScreen();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    public B_RegisterScreen() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize.width, screenSize.height);
+        setLocationRelativeTo(null);
 
-	/**
-	 * Create the frame.
-	 */
-	public B_RegisterScreen() {
-		setBackground(Color.DARK_GRAY);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
-		contentPane.setBackground(Color.LIGHT_GRAY);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        JPanel contentPane = new JPanel(new GridBagLayout());
+        contentPane.setBackground(Color.LIGHT_GRAY);
+        setContentPane(contentPane);
 
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-		JLabel lblRegistro = new JLabel("REGISTRO");
-		lblRegistro.setForeground(new Color(0, 0, 0));
-		lblRegistro.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblRegistro.setBounds(172, 12, 83, 23);
-		contentPane.add(lblRegistro);
+        JLabel lblRegistro = new JLabel("REGISTRO");
+        lblRegistro.setFont(new Font("Dialog", Font.BOLD, 26));
+        lblRegistro.setForeground(Color.BLACK);
+        contentPane.add(lblRegistro, gbc);
 
-		//label y campo para nombre de usuario
-		JLabel lblNombreUsuario = new JLabel("Nombre de usuario:");
-		lblNombreUsuario.setForeground(Color.BLACK);
-		lblNombreUsuario.setBounds(12, 49, 140, 17);
-		contentPane.add(lblNombreUsuario);
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lblNombreUsuario = new JLabel("Nombre de usuario:");
+        lblNombreUsuario.setFont(new Font("Dialog", Font.PLAIN, 16));
+        contentPane.add(lblNombreUsuario, gbc);
 
-		nombreUsuarioField = new JTextField();
-		nombreUsuarioField.setBounds(172, 47, 212, 21);
-		contentPane.add(nombreUsuarioField);
-		nombreUsuarioField.setColumns(10);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        nombreUsuarioField = new JTextField(20);
+        contentPane.add(nombreUsuarioField, gbc);
 
-		JLabel lblCorreoElectrnico = new JLabel("Correo electrónico:");
-		lblCorreoElectrnico.setForeground(Color.BLACK);
-		lblCorreoElectrnico.setBounds(12, 78, 122, 17);
-		contentPane.add(lblCorreoElectrnico);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lblCorreo = new JLabel("Correo electrónico:");
+        lblCorreo.setFont(new Font("Dialog", Font.PLAIN, 16));
+        contentPane.add(lblCorreo, gbc);
 
-		JLabel lblContrasea = new JLabel("Contraseña:");
-		lblContrasea.setForeground(Color.BLACK);
-		lblContrasea.setBounds(12, 115, 122, 17);
-		contentPane.add(lblContrasea);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        correoField = new JTextField(20);
+        contentPane.add(correoField, gbc);
 
-		JLabel lblRepetirContrasea = new JLabel("Repetir contraseña:");
-		lblRepetirContrasea.setForeground(Color.BLACK);
-		lblRepetirContrasea.setBounds(12, 144, 122, 17);
-		contentPane.add(lblRepetirContrasea);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lblContrasena = new JLabel("Contraseña:");
+        lblContrasena.setFont(new Font("Dialog", Font.PLAIN, 16));
+        contentPane.add(lblContrasena, gbc);
 
-		correoField = new JTextField();
-		correoField.setBounds(172, 76, 212, 21);
-		contentPane.add(correoField);
-		correoField.setColumns(10);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        passwordField = new JPasswordField(20);
+        contentPane.add(passwordField, gbc);
 
-		passwordField = new JPasswordField();
-		passwordField.setBounds(172, 109, 212, 21);
-		contentPane.add(passwordField);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lblRepetir = new JLabel("Repetir contraseña:");
+        lblRepetir.setFont(new Font("Dialog", Font.PLAIN, 16));
+        contentPane.add(lblRepetir, gbc);
 
-		repeat_passwordField = new JPasswordField();
-		repeat_passwordField.setBounds(172, 142, 212, 21);
-		contentPane.add(repeat_passwordField);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        repeatPasswordField = new JPasswordField(20);
+        contentPane.add(repeatPasswordField, gbc);
 
-		JButton btnRegistrarse = new JButton("Registrarse");
-		btnRegistrarse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JButton btnRegistrar = new JButton("Registrarse");
+        btnRegistrar.addActionListener(this::registroAction);
+        contentPane.add(btnRegistrar, gbc);
 
-				//Creo los Strings para que se guarde correo y las passwords y nombre_usuario
-				String correo = correoField.getText().trim();
-				String pass1 = new String(passwordField.getPassword());
-				String pass2 = new String(repeat_passwordField.getPassword());
-				String nombreUsuario = nombreUsuarioField.getText().trim();
+        gbc.gridy = 6;
+        JButton btnVolver = new JButton("¿Ya tienes cuenta?");
+        btnVolver.addActionListener(e -> {
+            A_LoginScreen login = new A_LoginScreen();
+            login.setVisible(true);
+            dispose();
+        });
+        contentPane.add(btnVolver, gbc);
+    }
 
-				//Valido que sean iguales, si no, salta un pop-up de Error
-				if (!pass1.equals(pass2)) {
-					JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				//Valido que contenga un @ y un .
-				if (!correo.contains("@") || !correo.contains(".")) {
-					JOptionPane.showMessageDialog(null, "El correo electrónico no es válido.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
+    private void registroAction(ActionEvent e) {
+        String correo = correoField.getText().trim();
+        String pass1 = new String(passwordField.getPassword());
+        String pass2 = new String(repeatPasswordField.getPassword());
+        String nombreUsuario = nombreUsuarioField.getText().trim();
 
-				//Me guardo en variable el @ y el . y sus posiciones. Miro que el @ esté antes que el .
-				int arroba = correo.indexOf('@');
-				int punto = correo.lastIndexOf('.');
+        if (correo.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || nombreUsuario.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, rellena todos los campos.");
+            return;
+        }
 
-				if (arroba <= 0 || punto <= arroba + 1 || punto == correo.length() - 1) {
-					JOptionPane.showMessageDialog(null, "El correo electrónico no es válido.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
+        if (!pass1.equals(pass2)) {
+            JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.");
+            return;
+        }
 
-				//Valido que todos los campos estén rellenados
-				if (correo.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || nombreUsuario.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Por favor, rellena todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				//Valido que la contraseña tenga mínimo 6 carácteres
-				if (pass1.length() < 6) {
-					JOptionPane.showMessageDialog(null, "La contraseña debe tener al menos 6 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				// Creamos la hashedPassword como la que ha creado el user
-				 String hashedPassword = hashPassword(pass1);
+        if (pass1.length() < 6) {
+            JOptionPane.showMessageDialog(null, "La contraseña debe tener al menos 6 caracteres.");
+            return;
+        }
 
-				//Entro a la conexión de la BDD local
-				try (Connection conexion = DriverManager.getConnection(
-						"jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
+        if (!correo.contains("@") || !correo.contains(".") || correo.startsWith("@") || correo.endsWith(".")) {
+            JOptionPane.showMessageDialog(null, "Correo no válido.");
+            return;
+        }
 
-					//Miro si hay un correo electronico ya que sea igual.
-					String checkQuery = "SELECT * FROM Usuarios WHERE correo = ?";
-					try (PreparedStatement statement = conexion.prepareStatement(checkQuery)) {
-						statement.setString(1, correo);
-						try (ResultSet rs = statement.executeQuery()) {
-							if (rs.next()) {
-								JOptionPane.showMessageDialog(null, "Este correo ya está registrado.");
-								return;
-							}
-						}
-					}
+        if (User.existeCorreo(correo)) {
+            JOptionPane.showMessageDialog(null, "El correo ya está registrado.");
+            return;
+        }
 
-					//Miro si hay un nombre de usuario igual
-					String checkUserQuery = "SELECT * FROM Usuarios WHERE nombre_usuario = ?";
-					try (PreparedStatement statement = conexion.prepareStatement(checkUserQuery)) {
-						statement.setString(1, nombreUsuario);
-						try (ResultSet rs = statement.executeQuery()) {
-							if (rs.next()) {
-								JOptionPane.showMessageDialog(null, "Este nombre de usuario ya está en uso.");
-								return;
-							}
-						}
-					}
+        if (User.existeUsuario(nombreUsuario)) {
+            JOptionPane.showMessageDialog(null, "El nombre de usuario ya existe.");
+            return;
+        }
 
-					//Si pasa lo anterior, creo el nuevo usuario y su contraseña y nombre_usuario
-					String insertQuery = "INSERT INTO Usuarios (correo, contrasenya, nombre_usuario) VALUES (?, ?, ?)";
-                    try (PreparedStatement insertStmt = conexion.prepareStatement(insertQuery)) {
-                        insertStmt.setString(1, correo);
-                        insertStmt.setString(2, hashedPassword); // Guardamos el hash de la contraseña
-                        insertStmt.setString(3, nombreUsuario); // Guardamos el nombre de usuario
-                        insertStmt.executeUpdate();
-                    }
+        boolean exito = User.registrarUsuario(nombreUsuario, correo, pass1);
 
-					JOptionPane.showMessageDialog(null, "Cuenta creada con éxito.");
-
-					//Me pasa a la pantalla de Login
-					A_LoginScreen loginScreen = new A_LoginScreen();
-					loginScreen.setVisible(true);
-					dispose();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Error al registrar la cuenta.", "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
-		btnRegistrarse.setBounds(170, 188, 105, 27);
-		contentPane.add(btnRegistrarse);
-	}
-	 private String hashPassword(String password) {
-	        try {
-	            // Crear el objeto MessageDigest con el algoritmo SHA-256
-	            MessageDigest md = MessageDigest.getInstance("SHA-256");
-	            
-	            // Generar el hash de la contraseña
-	            byte[] hashBytes = md.digest(password.getBytes());
-	            
-	            // Convertir el array de bytes a una cadena hexadecimal
-	            StringBuilder hexString = new StringBuilder();
-	            for (byte b : hashBytes) {
-	                hexString.append(String.format("%02x", b));
-	            }
-	            
-	            return hexString.toString();
-	        } catch (NoSuchAlgorithmException e) {
-	            e.printStackTrace();
-	            return null;
-	        }
-	    }
+        if (exito) {
+            JOptionPane.showMessageDialog(null, "Cuenta creada correctamente.");
+            A_LoginScreen login = new A_LoginScreen();
+            login.setVisible(true);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(null, "Error en el registro.");
+        }
+    }
 }
