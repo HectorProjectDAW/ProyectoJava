@@ -54,8 +54,16 @@ public class F_PartidaPerdidaScreen extends JFrame {
 		contentPane.add(lblNewLabel);
 		
 		JButton btnVolverAJugar = new JButton("Volver a jugar");
+		btnVolverAJugar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				D_SelectorTemasScreen selector = new D_SelectorTemasScreen();
+				selector.setVisible(true);
+				dispose();
+			}
+		});
 		btnVolverAJugar.setBounds(150, 78, 142, 27);
 		contentPane.add(btnVolverAJugar);
+
 		
 		JButton btnTienda = new JButton("Tienda");
 		btnTienda.setBounds(150, 117, 142, 27);
