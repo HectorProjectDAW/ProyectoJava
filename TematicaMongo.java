@@ -1,3 +1,4 @@
+
 package com.proyecto.mi_proyecto;
 
 import com.mongodb.client.*;
@@ -80,54 +81,4 @@ public class TematicaMongo {
 
         return lista;
     }
-
-    public static void guardarPartida(String usuario, String tematica, String palabra, String estadoActual, 
-                                     int errores, int racha, List<Character> letrasFallidas) {
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> partidas = database.getCollection("partidas");
-
-            // Buscar si ya existe una partida guardada para ese usuario
-            Document filtro = new Document("usuario", usuario);
-            Document partidaExistente = partidas.find(filtro).first();
-
-            // Crear el documento con todos los datos de la partida
-            Document partidaDoc = new Document("usuario", usuario)
-                    .append("tematica", tematica)
-                    .append("palabra", palabra)
-                    .append("estadoActual", estadoActual)
-                    .append("errores", errores)
-                    .append("racha", racha)
-                    .append("letrasFallidas", letrasFallidas);
-
-            if (partidaExistente == null) {
-                // Insertar nueva partida
-                partidas.insertOne(partidaDoc);
-            } else {
-                // Actualizar partida existente
-                partidas.updateOne(filtro, new Document("$set", partidaDoc));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    
-    // Carga la partida guardada de un usuario.
-    
-    // Devuelve el documento con los datos o null si no existe.
-     
-    public static Document cargarPartida(String usuario) {
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> partidas = database.getCollection("partidas");
-
-            Document filtro = new Document("usuario", usuario);
-            return partidas.find(filtro).first();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }
