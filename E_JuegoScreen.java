@@ -1,241 +1,226 @@
 package com.proyecto.mi_proyecto;
 
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.util.List;
-import java.util.Random;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class E_JuegoScreen extends JFrame {
 
-    private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private JLabel labelPalabra;
-    private JTextField inputLetra;
-    private JLabel labelErrores;
-    private JLabel labelTematica;
-    private DibujoAhorcado panelDibujo;
+	protected String tematica;
+	protected Partida partida;
+	protected int rachaPalabras = 0;
 
-    //inicializar variables
-    private char[] letrasPalabra;
-    private char[] estadoActual;
-    private int errores = 0;
-    private String palabra;
-    private String tematica;
-    private List<Character> letrasFallidas = new ArrayList<>();
-    private JLabel labelFallidas;
-    private JButton btnProbar;
-    private JLabel labelRacha;
+	protected JLabel labelTematica, labelPalabra, labelErrores, labelFallidas, labelRacha;
+	protected JTextField textFieldIntento;
+	protected JPanel panelDibujo;
 
-    //lo de la racha de aciertos y palabras de mongo
-    private int aciertosTematica = 0;
-    private List<String> todasTematicas = TematicaMongo.obtenerTodas();
-    private Random random = new Random();
+	public E_JuegoScreen(String tematicaSeleccionada) {
+		this.tematica = tematicaSeleccionada;
+		setTitle("Ahorcado");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setUndecorated(true);
+		getContentPane().setBackground(new Color(245, 245, 245));
+		setLayout(new BorderLayout());
 
-    public E_JuegoScreen(String tematicaInicial) {
-        this.tematica = tematicaInicial;
+		JButton botonCerrar = new JButton("X");
+		botonCerrar.setFont(new Font("Arial", Font.BOLD, 18));
+		botonCerrar.setForeground(Color.RED);
+		botonCerrar.setFocusPainted(false);
+		botonCerrar.addActionListener(e -> dispose());
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 600, 400);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
+		JPanel panelCerrar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		panelCerrar.setBackground(new Color(245, 245, 245));
+		panelCerrar.add(botonCerrar);
+		add(panelCerrar, BorderLayout.NORTH);
 
-        labelTematica = new JLabel("Temática: " + tematica);
-        labelTematica.setFont(new Font("Dialog", Font.BOLD, 20));
-        labelTematica.setBounds(179, 0, 300, 30);
-        contentPane.add(labelTematica);
+		JPanel panelSuperior = new JPanel();
+		panelSuperior.setLayout(new BoxLayout(panelSuperior, BoxLayout.Y_AXIS));
+		panelSuperior.setBackground(new Color(230, 230, 250));
+		panelSuperior.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        JLabel lblTitulo = new JLabel("Adivina la palabra:");
-        lblTitulo.setBounds(30, 42, 200, 20);
-        contentPane.add(lblTitulo);
+		labelTematica = new JLabel("Temática: " + tematica, SwingConstants.CENTER);
+		labelTematica.setFont(new Font("Arial", Font.BOLD, 30));
+		labelTematica.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        labelPalabra = new JLabel("");
-        labelPalabra.setFont(new Font("Monospaced", Font.BOLD, 18));
-        labelPalabra.setBounds(30, 70, 500, 30);
-        contentPane.add(labelPalabra);
+		labelPalabra = new JLabel("", SwingConstants.CENTER);
+		labelPalabra.setFont(new Font("Courier New", Font.BOLD, 40));
+		labelPalabra.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel lblIntroduceLetra = new JLabel("Introduce una letra o palabra:");
-        lblIntroduceLetra.setBounds(30, 120, 200, 20);
-        contentPane.add(lblIntroduceLetra);
+		JPanel panelInfo = new JPanel(new GridLayout(1, 3, 20, 0));
+		panelInfo.setMaximumSize(new Dimension(800, 40));
+		panelInfo.setBackground(new Color(230, 230, 250));
 
-        inputLetra = new JTextField();
-        inputLetra.setBounds(230, 120, 100, 25);
-        contentPane.add(inputLetra);
-        inputLetra.setColumns(10);
+		labelErrores = new JLabel("Errores: 0", SwingConstants.CENTER);
+		labelFallidas = new JLabel("Letras fallidas: ", SwingConstants.CENTER);
+		labelRacha = new JLabel("Racha: 0", SwingConstants.CENTER);
+		labelErrores.setFont(new Font("Arial", Font.PLAIN, 20));
+		labelFallidas.setFont(new Font("Arial", Font.PLAIN, 20));
+		labelRacha.setFont(new Font("Arial", Font.PLAIN, 20));
 
-        btnProbar = new JButton("Probar");
-        btnProbar.setBounds(350, 120, 100, 25);
-        contentPane.add(btnProbar);
+		panelInfo.add(labelErrores);
+		panelInfo.add(labelFallidas);
+		panelInfo.add(labelRacha);
 
-        labelErrores = new JLabel("Errores: 0");
-        labelErrores.setBounds(30, 160, 200, 20);
-        contentPane.add(labelErrores);
+		panelSuperior.add(labelTematica);
+		panelSuperior.add(Box.createVerticalStrut(20));
+		panelSuperior.add(labelPalabra);
+		panelSuperior.add(Box.createVerticalStrut(20));
+		panelSuperior.add(panelInfo);
 
-        labelFallidas = new JLabel("Letras fallidas: ");
-        labelFallidas.setBounds(30, 190, 500, 20);
-        contentPane.add(labelFallidas);
+		add(panelSuperior, BorderLayout.PAGE_START);
 
-        labelRacha = new JLabel("Racha: 0");
-        labelRacha.setBounds(30, 220, 200, 20);
-        contentPane.add(labelRacha);
+		panelDibujo = new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				dibujarAhorcado(g, partida != null ? partida.getLetrasFallidas().size() : 0);
+			}
+		};
+		panelDibujo.setBackground(Color.WHITE);
+		add(panelDibujo, BorderLayout.CENTER);
 
-        panelDibujo = new DibujoAhorcado();
-        panelDibujo.setBounds(350, 40, 200, 250);
-        contentPane.add(panelDibujo);
+		JPanel panelInferior = new JPanel();
+		panelInferior.setBackground(new Color(230, 230, 250));
+		panelInferior.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+		panelInferior.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
-        cargarNuevaPalabra();
+		JLabel labelIntento = new JLabel("Letra o palabra:");
+		labelIntento.setFont(new Font("Arial", Font.PLAIN, 20));
+		textFieldIntento = new JTextField(20);
+		textFieldIntento.setFont(new Font("Arial", Font.PLAIN, 24));
 
-        btnProbar.addActionListener(e -> {
-            if (errores >= 6 || String.valueOf(estadoActual).equals(String.valueOf(letrasPalabra))) return;
+		JButton btnProbar = new JButton("Probar");
+		btnProbar.setFont(new Font("Arial", Font.BOLD, 20));
+		btnProbar.addActionListener(e -> manejarIntento());
 
-            String texto = inputLetra.getText().toUpperCase().trim();
-            inputLetra.setText("");
+		panelInferior.add(labelIntento);
+		panelInferior.add(textFieldIntento);
+		panelInferior.add(btnProbar);
 
-            if (texto.length() > 1) {
-                if (texto.equals(palabra)) {
-                    estadoActual = letrasPalabra.clone();
-                    actualizarLabel();
-                    JOptionPane.showMessageDialog(this, "¡Correcto! La palabra era: " + palabra);
-                    aciertosTematica++; 
-                    labelRacha.setText("Racha: " + aciertosTematica);
-                    if (aciertosTematica >= 5) {
-                        cambiarTematica();
-                    } else {
-                        cargarNuevaPalabra();
-                    }
-                } else {
-                    errores = 6;
-                    labelErrores.setText("Errores: " + errores);
-                    panelDibujo.repaint();
-                    JOptionPane.showMessageDialog(this, "Palabra incorrecta. Has perdido. La palabra era: " + palabra);
-                    dispose();
-                    new F_PartidaPerdidaScreen().setVisible(true);
-                }
-                return;
-            }
+		add(panelInferior, BorderLayout.SOUTH);
 
-            if (texto.length() != 1 || !Character.isLetter(texto.charAt(0))) {
-                JOptionPane.showMessageDialog(this, "Introduce una sola letra válida o la palabra completa.");
-                return;
-            }
+		cargarNuevaPalabra();
+	}
 
-            char letra = texto.charAt(0);
-            boolean acierto = false;
+	protected void manejarIntento() {
+		String intento = textFieldIntento.getText().trim().toLowerCase();
+		textFieldIntento.setText("");
 
-            for (int i = 0; i < letrasPalabra.length; i++) {
-                if (letrasPalabra[i] == letra && estadoActual[i] == '_') {
-                    estadoActual[i] = letra;
-                    acierto = true;
-                }
-            }
+		if (intento.isEmpty()) return;
 
-            if (!acierto) {
-                if (!letrasFallidas.contains(letra)) letrasFallidas.add(letra);
-                errores++;
-                labelErrores.setText("Errores: " + errores);
-                labelFallidas.setText("Letras fallidas: " + letrasFallidas.toString().replaceAll("[\\[\\],]", ""));
-                panelDibujo.repaint();
+		if (intento.length() > 1) {
+			if (intento.equals(partida.getPalabra().toLowerCase())) {
+				JOptionPane.showMessageDialog(this, "¡Adivinado!");
+				rachaPalabras++;
+				labelRacha.setText("Racha: " + rachaPalabras);
+				if (rachaPalabras == 5) {
+					cambiarTematica();
+				} else {
+					cargarNuevaPalabra();
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Palabra incorrecta. Has perdido.\nLa palabra era: " + partida.getPalabra());
+				dispose();
+				new F_PartidaPerdidaScreen().setVisible(true);
+			}
+		} else {
+			char letra = intento.charAt(0);
+			int erroresAntes = partida.getLetrasFallidas().size();
 
-                
+			partida.intentarLetra(letra);
+			actualizarLabel();
 
-                if (errores >= 6) {
-                    JOptionPane.showMessageDialog(this, "Has perdido. La palabra era: " + palabra);
-                    dispose();
-                    new F_PartidaPerdidaScreen().setVisible(true);
-                }
-            } else {
-                if (String.valueOf(estadoActual).equals(String.valueOf(letrasPalabra))) {
-                    JOptionPane.showMessageDialog(this, "¡Correcto! La palabra era: " + palabra);
-                    aciertosTematica++; 
-                    labelRacha.setText("Racha: " + aciertosTematica);
-                    if (aciertosTematica >= 5) {
-                        cambiarTematica();
-                    } else {
-                        cargarNuevaPalabra();
-                    }
-                }
-            }
-            actualizarLabel();
-        });
-    }
+			int erroresActuales = partida.getLetrasFallidas().size();
+			if (erroresActuales > erroresAntes) {
+				labelErrores.setText("Errores: " + erroresActuales);
+				labelFallidas.setText("Letras fallidas: " + partida.getLetrasFallidas().toString().replaceAll("[\\[\\],]", ""));
+				panelDibujo.repaint();
+				if (erroresActuales >= 6) {
+					JOptionPane.showMessageDialog(this, "Has perdido. La palabra era: " + partida.getPalabra());
+					dispose();
+					new F_PartidaPerdidaScreen().setVisible(true);
+				}
+			} else {
+				if (partida.palabraCompleta()) {
+					JOptionPane.showMessageDialog(this, "¡Adivinado!");
+					rachaPalabras++;
+					labelRacha.setText("Racha: " + rachaPalabras);
+					if (rachaPalabras == 5) {
+						cambiarTematica();
+					} else {
+						cargarNuevaPalabra();
+					}
+				}
+			}
+		}
+	}
 
-    private void actualizarLabel() {
-        StringBuilder cosa = new StringBuilder();
-        for (char c : estadoActual) cosa.append(c).append(" ");
-        labelPalabra.setText(cosa.toString().trim());
-    }
+	protected void cargarNuevaPalabra() {
+		String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
+		if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No hay palabras para la temática: " + tematica);
+			dispose();
+			return;
+		}
 
-    private void cargarNuevaPalabra() {
-    	
-    	//Palabra random de mongodb
-        palabra = TematicaMongo.palabraRandom(tematica);
-        if (palabra == null || palabra.isEmpty()) {
-        	//Si ya no hay, suelta esto
-            JOptionPane.showMessageDialog(this, "No hay palabras para la temática: " + tematica);
-            dispose();
-            return;
-        }
+		partida = new Partida(tematica, nuevaPalabra, "Usuario", new ArrayList<>(), new ArrayList<>(), 0);
+		panelDibujo.repaint();
+		actualizarLabel();
+		labelErrores.setText("Errores: 0");
+		labelFallidas.setText("Letras fallidas: ");
+		labelRacha.setText("Racha: " + rachaPalabras);
+	}
 
-        //Lo convierte en mayuscula y en charArray
-        palabra = palabra.toUpperCase();
-        letrasPalabra = palabra.toCharArray();
-        estadoActual = new char[letrasPalabra.length];
+	protected void actualizarLabel() {
+		String palabra = partida.getPalabra().toLowerCase();
+		List<Character> letrasAdivinadas = partida.getLetrasAdivinadas();
 
-        //Rellenar con _ los huecos
-        for (int i = 0; i < letrasPalabra.length; i++) {
-            if (Character.isLetter(letrasPalabra[i])) {
-                estadoActual[i] = '_';
-            } else {
-                estadoActual[i] = letrasPalabra[i];
-            }
-        }
-        
-        //Reinicia errores
-        errores = 0;
-        letrasFallidas.clear();
-        labelErrores.setText("Errores: 0");
-        labelFallidas.setText("Letras fallidas: ");
-        labelRacha.setText("Racha: " + aciertosTematica);
-        panelDibujo.repaint();
-        actualizarLabel();
-    }
+		StringBuilder estado = new StringBuilder();
+		for (int i = 0; i < palabra.length(); i++) {
+			char c = palabra.charAt(i);
+			if (!Character.isLetter(c)) {
+				estado.append(c);
+			} else if (letrasAdivinadas.contains(c)) {
+				estado.append(Character.toUpperCase(c));
+			} else {
+				estado.append('_');
+			}
+			estado.append(' ');
+		}
+		labelPalabra.setText(estado.toString());
+	}
 
-    
-    //Copiar todas las tematicas en "opciones"
-    private void cambiarTematica() {
-        List<String> opciones = new ArrayList<>(todasTematicas);
-        //Eliminar la actual
-        opciones.remove(tematica);
-        //Seleccion tematica random
-        tematica = opciones.get(random.nextInt(opciones.size()));
-        //Actualizar txt
-        labelTematica.setText("Temática: " + tematica);
-        aciertosTematica = 0;
-        labelRacha.setText("Racha: 0");
-        cargarNuevaPalabra();
-    }
+	protected void cambiarTematica() {
+		List<String> opciones = new ArrayList<>(TematicaMongo.obtenerTodas());
+		opciones.remove(tematica);
+		if (opciones.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No hay más temáticas disponibles.");
+			dispose();
+			return;
+		}
 
-    
-    //Dibujo
-    private class DibujoAhorcado extends JPanel {
-        private static final long serialVersionUID = 1L;
+		tematica = opciones.get(new Random().nextInt(opciones.size()));
+		JOptionPane.showMessageDialog(this, "¡Has acertado 5 palabras! Nueva temática: " + tematica);
+		rachaPalabras = 0;
+		labelTematica.setText("Temática: " + tematica);
+		labelRacha.setText("Racha: 0");
+		cargarNuevaPalabra();
+	}
 
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.setColor(Color.BLACK);
-            g.drawLine(20, 180, 180, 180);
-            g.drawLine(100, 180, 100, 20);
-            g.drawLine(100, 20, 160, 20);
-            g.drawLine(160, 20, 160, 40);
-            if (errores > 0) g.drawOval(140, 40, 40, 40);
-            if (errores > 1) g.drawLine(160, 80, 160, 120);
-            if (errores > 2) g.drawLine(160, 90, 140, 110);
-            if (errores > 3) g.drawLine(160, 90, 180, 110);
-            if (errores > 4) g.drawLine(160, 120, 140, 150);
-            if (errores > 5) g.drawLine(160, 120, 180, 150);
-        }
-    }
+	protected void dibujarAhorcado(Graphics g, int errores) {
+		g.drawLine(50, 450, 150, 450);
+		g.drawLine(100, 450, 100, 100);
+		g.drawLine(100, 100, 300, 100);
+		g.drawLine(300, 100, 300, 140);
+
+		if (errores > 0) g.drawOval(275, 140, 50, 50);
+		if (errores > 1) g.drawLine(300, 190, 300, 290);
+		if (errores > 2) g.drawLine(300, 200, 260, 240);
+		if (errores > 3) g.drawLine(300, 200, 340, 240);
+		if (errores > 4) g.drawLine(300, 290, 260, 340);
+		if (errores > 5) g.drawLine(300, 290, 340, 340);
+	}
 }
