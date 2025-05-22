@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class E_JuegoScreen extends JFrame {
-    
+
     protected String tematica;
     protected Partida partida;
     protected int rachaPalabras = 0;
@@ -65,26 +65,10 @@ public class E_JuegoScreen extends JFrame {
         menuBar.add(menuArchivo);
 
         JMenuItem itemSalirMenu = new JMenuItem("Salir al menú principal");
-        itemSalirMenu.addActionListener(e -> {
-            int confirmacion = JOptionPane.showConfirmDialog(this,
-                    "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
-                menu.setVisible(true);
-                dispose();
-            }
-        });
+        itemSalirMenu.addActionListener(e -> confirmarYSalirMenu());
 
         JMenuItem itemSalirApp = new JMenuItem("Salir de la aplicación");
-        itemSalirApp.addActionListener(e -> {
-            int res = JOptionPane.showConfirmDialog(this,
-                    "¿Estás seguro de que quieres salir de la aplicación?", "Confirmar salida",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (res == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        });
+        itemSalirApp.addActionListener(e -> confirmarYSalirApp());
 
         menuArchivo.add(itemSalirMenu);
         menuArchivo.addSeparator();
@@ -148,61 +132,7 @@ public class E_JuegoScreen extends JFrame {
 
         JButton btnProbar = new JButton("Probar");
         btnProbar.setFont(new Font("Arial", Font.BOLD, 20));
-        btnProbar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String intento = textFieldIntento.getText().toLowerCase().trim();
-                textFieldIntento.setText("");
-                if (intento.isEmpty()) {
-                    return;
-                }
-                if (intento.length() > 1) {
-                    if (intento.equalsIgnoreCase(partida.getPalabra())) {
-                        JOptionPane.showMessageDialog(E_JuegoScreen.this, "¡Adivinado!");
-                        rachaPalabras++;
-                        labelRacha.setText("Racha: " + rachaPalabras);
-                        if (rachaPalabras == 5) {
-                            cambiarTematica();
-                        } else {
-                            cargarNuevaPalabra();
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(E_JuegoScreen.this,
-                                "Palabra incorrecta. Has perdido.\nLa palabra era: " + partida.getPalabra());
-                        dispose();
-                        new F_PartidaPerdidaScreen().setVisible(true);
-                    }
-                } else {
-                    char letra = intento.charAt(0);
-                    int erroresAntes = partida.getLetrasFallidas().size();
-                    partida.intentarLetra(letra);
-                    actualizarLabel();
-                    int erroresDespues = partida.getLetrasFallidas().size();
-
-                    if (erroresDespues > erroresAntes) {
-                        labelErrores.setText("Errores: " + erroresDespues);
-                        labelFallidas.setText("Letras fallidas: " + partida.getLetrasFallidas().toString().replaceAll("[\\[\\],]", ""));
-                        panelDibujo.repaint();
-                        if (erroresDespues >= 6) {
-                            JOptionPane.showMessageDialog(E_JuegoScreen.this,
-                                    "Has perdido. La palabra era: " + partida.getPalabra());
-                            dispose();
-                            new F_PartidaPerdidaScreen().setVisible(true);
-                        }
-                    } else {
-                        if (partida.palabraCompleta()) {
-                            JOptionPane.showMessageDialog(E_JuegoScreen.this, "¡Adivinado!");
-                            rachaPalabras++;
-                            labelRacha.setText("Racha: " + rachaPalabras);
-                            if (rachaPalabras == 5) {
-                                cambiarTematica();
-                            } else {
-                                cargarNuevaPalabra();
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        btnProbar.addActionListener(e -> procesarIntento());
 
         panelInferior.add(labelIntento);
         panelInferior.add(textFieldIntento);
@@ -213,6 +143,93 @@ public class E_JuegoScreen extends JFrame {
         cargarNuevaPalabra();
     }
 
+    // Método para confirmar y salir al menú principal
+    private void confirmarYSalirMenu() {
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+                "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            new C_MenuPrincipalScreen().setVisible(true);
+            dispose();
+        }
+    }
+
+    // Método para confirmar y salir de la aplicación
+    private void confirmarYSalirApp() {
+        int res = JOptionPane.showConfirmDialog(this,
+                "¿Estás seguro de que quieres salir de la aplicación?", "Confirmar salida",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (res == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
+
+    // Procesa el intento de letra o palabra
+    private void procesarIntento() {
+        String intento = textFieldIntento.getText().toLowerCase().trim();
+        textFieldIntento.setText("");
+        if (intento.isEmpty()) {
+            return;
+        }
+
+        if (intento.length() > 1) {
+            procesarPalabraCompleta(intento);
+        } else {
+            procesarLetra(intento.charAt(0));
+        }
+    }
+
+    // Procesa el intento de palabra completa
+    private void procesarPalabraCompleta(String intento) {
+        if (intento.equalsIgnoreCase(partida.getPalabra())) {
+            JOptionPane.showMessageDialog(this, "¡Adivinado!");
+            aumentarRachaOCambiarTematica();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Palabra incorrecta. Has perdido.\nLa palabra era: " + partida.getPalabra());
+            finalizarPartidaPerdida();
+        }
+    }
+
+    // Procesa el intento de una sola letra
+    private void procesarLetra(char letra) {
+        int erroresAntes = partida.getLetrasFallidas().size();
+        partida.intentarLetra(letra);
+        actualizarLabel();
+
+        int erroresDespues = partida.getLetrasFallidas().size();
+
+        if (erroresDespues > erroresAntes) {
+            labelErrores.setText("Errores: " + erroresDespues);
+            labelFallidas.setText("Letras fallidas: " + partida.getLetrasFallidas().toString().replaceAll("[\\[\\],]", ""));
+            panelDibujo.repaint();
+
+            if (erroresDespues >= 6) {
+                JOptionPane.showMessageDialog(this,
+                        "Has perdido. La palabra era: " + partida.getPalabra());
+                finalizarPartidaPerdida();
+            }
+        } else {
+            if (partida.palabraCompleta()) {
+                JOptionPane.showMessageDialog(this, "¡Adivinado!");
+                aumentarRachaOCambiarTematica();
+            }
+        }
+    }
+
+    // Incrementa racha o cambia temática si llega a 5
+    private void aumentarRachaOCambiarTematica() {
+        rachaPalabras++;
+        labelRacha.setText("Racha: " + rachaPalabras);
+
+        if (rachaPalabras == 5) {
+            cambiarTematica();
+        } else {
+            cargarNuevaPalabra();
+        }
+    }
+
+    // Carga una nueva palabra para la temática actual
     protected void cargarNuevaPalabra() {
         String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
         if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
@@ -228,6 +245,7 @@ public class E_JuegoScreen extends JFrame {
         labelRacha.setText("Racha: " + rachaPalabras);
     }
 
+    // Actualiza la etiqueta que muestra la palabra con letras adivinadas
     protected void actualizarLabel() {
         String palabra = partida.getPalabra().toLowerCase();
         List<Character> letrasAdivinadas = partida.getLetrasAdivinadas();
@@ -249,14 +267,15 @@ public class E_JuegoScreen extends JFrame {
         labelPalabra.setText(estado.toString());
     }
 
+    // Cambia la temática tras 5 aciertos seguidos
     protected void cambiarTematica() {
-    	List<String> tematicas = TematicaMongo.obtenerTodas();
+        List<String> tematicas = TematicaMongo.obtenerTodas();
         if (tematicas.size() < 2)
             return;
 
         Random r = new Random();
-
         String nuevaTematica;
+
         do {
             nuevaTematica = tematicas.get(r.nextInt(tematicas.size()));
         } while (nuevaTematica.equalsIgnoreCase(tematica));
@@ -268,9 +287,8 @@ public class E_JuegoScreen extends JFrame {
         cargarNuevaPalabra();
     }
 
+    // Dibuja el ahorcado según el número de errores
     protected void dibujarAhorcado(Graphics g, int errores) {
-        // Dibujo
-
         int baseX = 50, baseY = 350;
 
         g.setColor(Color.BLACK);
@@ -278,7 +296,7 @@ public class E_JuegoScreen extends JFrame {
         // Base
         g.drawLine(baseX, baseY, baseX + 200, baseY);
 
-        // Palitroque
+        // Palitroque vertical
         g.drawLine(baseX + 50, baseY, baseX + 50, baseY - 300);
 
         // Palitroque horizontal
@@ -294,15 +312,22 @@ public class E_JuegoScreen extends JFrame {
             g.drawLine(baseX + 150, baseY - 200, baseX + 150, baseY - 100);
 
         if (errores > 2) // Brazo izquierdo
-            g.drawLine(baseX + 150, baseY - 180, baseX + 110, baseY - 140);
+            g.drawLine(baseX + 150, baseY - 180, baseX + 120, baseY - 150);
 
         if (errores > 3) // Brazo derecho
-            g.drawLine(baseX + 150, baseY - 180, baseX + 190, baseY - 140);
+            g.drawLine(baseX + 150, baseY - 180, baseX + 180, baseY - 150);
 
         if (errores > 4) // Pierna izquierda
-            g.drawLine(baseX + 150, baseY - 100, baseX + 110, baseY - 60);
+            g.drawLine(baseX + 150, baseY - 100, baseX + 120, baseY - 50);
 
         if (errores > 5) // Pierna derecha
-            g.drawLine(baseX + 150, baseY - 100, baseX + 190, baseY - 60);
+            g.drawLine(baseX + 150, baseY - 100, baseX + 180, baseY - 50);
+    }
+
+    // Finaliza la partida por derrota
+    private void finalizarPartidaPerdida() {
+        rachaPalabras = 0;
+        labelRacha.setText("Racha: 0");
+        cargarNuevaPalabra();
     }
 }
