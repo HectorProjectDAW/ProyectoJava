@@ -129,6 +129,7 @@ public class E_JuegoScreen extends JFrame {
 
         textFieldIntento = new JTextField(20);
         textFieldIntento.setFont(new Font("Arial", Font.PLAIN, 24));
+        textFieldIntento.addActionListener(e -> procesarIntento());
 
         JButton btnProbar = new JButton("Probar");
         btnProbar.setFont(new Font("Arial", Font.BOLD, 20));
