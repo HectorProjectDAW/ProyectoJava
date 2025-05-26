@@ -88,20 +88,25 @@ public class A_LoginScreen extends JFrame {
 		contentPane.add(btnCrearCuenta, gbc);
 	}
 
+	
+	//Metodo login
 	private void loginAction(ActionEvent e) {
 		String usuario = textField.getText();
 		String contrasenya = new String(passwordField.getPassword());
 
+		//Rellenar todo
 		if (usuario.isEmpty() || contrasenya.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Complete todos los campos por favor");
 			return;
 		}
 
+		//Si no está en base datos
 		if (!User.existeUsuario(usuario)) {
 			JOptionPane.showMessageDialog(this, "Usuario no encontrado");
 			return;
 		}
 
+		
 		if (User.validarCredenciales(usuario, contrasenya)) {
 			JOptionPane.showMessageDialog(this, "Inicio de sesión correcto");
 			C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
