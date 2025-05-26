@@ -46,7 +46,7 @@ public class E_JuegoScreen extends JFrame {
         getContentPane().setBackground(new Color(245, 245, 245));
         getContentPane().setLayout(new BorderLayout());
 
-        // Botón cerrar (X)
+        
         JButton botonCerrar = new JButton("X");
         botonCerrar.setFont(new Font("Arial", Font.BOLD, 18));
         botonCerrar.setForeground(Color.RED);
@@ -58,17 +58,17 @@ public class E_JuegoScreen extends JFrame {
         panelCerrar.add(botonCerrar);
         getContentPane().add(panelCerrar, BorderLayout.NORTH);
 
-        // Barra menú
+        
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menuArchivo = new JMenu("Opciones");
         menuBar.add(menuArchivo);
 
         JMenuItem itemSalirMenu = new JMenuItem("Salir al menú principal");
-        itemSalirMenu.addActionListener(e -> confirmarYSalirMenu());
+        itemSalirMenu.addActionListener(e -> salirMenu());
 
         JMenuItem itemSalirApp = new JMenuItem("Salir de la aplicación");
-        itemSalirApp.addActionListener(e -> confirmarYSalirApp());
+        itemSalirApp.addActionListener(e -> salirApp());
 
         menuArchivo.add(itemSalirMenu);
         menuArchivo.addSeparator();
@@ -76,7 +76,7 @@ public class E_JuegoScreen extends JFrame {
 
         setJMenuBar(menuBar);
 
-        // Panel superior con etiquetas
+       
         JPanel panelSuperior = new JPanel(new GridLayout(3, 1));
         panelSuperior.setBackground(new Color(230, 230, 250));
         panelSuperior.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -108,7 +108,7 @@ public class E_JuegoScreen extends JFrame {
 
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
-        // Panel central para dibujo
+        
         panelDibujo = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -119,7 +119,7 @@ public class E_JuegoScreen extends JFrame {
         panelDibujo.setBackground(Color.WHITE);
         getContentPane().add(panelDibujo, BorderLayout.CENTER);
 
-        // Panel inferior para input y botón
+        
         JPanel panelInferior = new JPanel();
         panelInferior.setBackground(new Color(230, 230, 250));
         panelInferior.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -144,8 +144,8 @@ public class E_JuegoScreen extends JFrame {
         cargarNuevaPalabra();
     }
 
-    // Método para confirmar y salir al menú principal
-    private void confirmarYSalirMenu() {
+    
+    private void salirMenu() {
         int confirmacion = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -156,7 +156,7 @@ public class E_JuegoScreen extends JFrame {
     }
 
     // Método para confirmar y salir de la aplicación
-    private void confirmarYSalirApp() {
+    private void salirApp() {
         int res = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir de la aplicación?", "Confirmar salida",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -165,7 +165,7 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
-    // Procesa el intento de letra o palabra
+    
     private void procesarIntento() {
         String intento = textFieldIntento.getText().toLowerCase().trim();
         textFieldIntento.setText("");
@@ -180,11 +180,11 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
-    // Procesa el intento de palabra completa
+    
     private void procesarPalabraCompleta(String intento) {
         if (intento.equalsIgnoreCase(partida.getPalabra())) {
             JOptionPane.showMessageDialog(this, "¡Adivinado!");
-            aumentarRachaOCambiarTematica();
+            rachaTema();
         } else {
             JOptionPane.showMessageDialog(this,
                     "Palabra incorrecta. Has perdido.\nLa palabra era: " + partida.getPalabra());
@@ -192,7 +192,7 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
-    // Procesa el intento de una sola letra
+    
     private void procesarLetra(char letra) {
         int erroresAntes = partida.getLetrasFallidas().size();
         partida.intentarLetra(letra);
@@ -213,13 +213,13 @@ public class E_JuegoScreen extends JFrame {
         } else {
             if (partida.palabraCompleta()) {
                 JOptionPane.showMessageDialog(this, "¡Adivinado!");
-                aumentarRachaOCambiarTematica();
+                rachaTema();
             }
         }
     }
 
     // Incrementa racha o cambia temática si llega a 5
-    private void aumentarRachaOCambiarTematica() {
+    private void rachaTema() {
         rachaPalabras++;
         labelRacha.setText("Racha: " + rachaPalabras);
 
