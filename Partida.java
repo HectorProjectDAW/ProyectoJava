@@ -15,7 +15,7 @@ public class Partida {
 
     public Partida(String tematica, String palabra, String user, List<Character> aciertos, List<Character> letrasFallidas, int racha) {
         if (tematica == null || palabra == null || user == null) {
-            throw new IllegalArgumentException("Temática, palabra y usuario no pueden ser null");
+            throw new IllegalArgumentException("Tematica, palabra y usuario no pueden ser null");
         }
         this.tematica = tematica;
         this.palabra = palabra;
@@ -134,4 +134,5 @@ public class Partida {
             .map(String::valueOf)
             .collect(Collectors.joining(" "));
     }
+    
 }
