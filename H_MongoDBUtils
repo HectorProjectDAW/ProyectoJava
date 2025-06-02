@@ -1,0 +1,53 @@
+package com.proyecto.mi_proyecto;
+
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import org.bson.Document;
+
+public class MongoDBUtils {
+
+    private static MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017"); // Cambia URI si hace falta
+    private static MongoDatabase database = mongoClient.getDatabase("tu_base_de_datos");
+    private static MongoCollection<Document> partidas = database.getCollection("partidas");
+
+    // Guarda una nueva partida para un usuario con la racha dada
+    public static void guardarPartida(String nombreUsuario, int racha) {
+        Document doc = new Document("usuario", nombreUsuario)
+                        .append("racha", racha);
+        partidas.insertOne(doc);
+    }
+
+    // Obtiene la partida guardada de un usuario (null si no existe)
+    public static Partida getPartidaUsuario(String nombreUsuario) {
+        MongoCollection<Document> coleccion = getConexion().getCollection("partidas");
+        Document doc = coleccion.find(Filters.eq("usuario", nombreUsuario)).first();
+
+        if (doc != null) {
+            int racha = doc.getInteger("racha");
+            return new Partida(
+                "", // temática no usada
+                "", // palabra no usada
+                nombreUsuario,
+                null,
+                null,
+                racha
+            );
+        }
+        return null;
+    }
+
+
+    private static MongoDatabase getConexion() {
+        return database;
+    }
+
+
+	// Actualiza la racha de un usuario
+    public static void actualizarPartida(String nombreUsuario, int nuevaRacha) {
+        partidas.updateOne(Filters.eq("usuario", nombreUsuario), Updates.set("racha", nuevaRacha));
+    }
+}
