@@ -1,0 +1,92 @@
+package com.proyecto.mi_proyecto;
+
+import com.mongodb.client.*;
+import com.mongodb.client.model.Sorts;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import org.bson.conversions.Bson;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RankingService {
+
+    private MongoClient mongoClient;
+    private MongoDatabase database;
+    private MongoCollection<Document> rankingCollection;
+    public void guardarOActualizarEntradaRanking(H_RankingEntry entrada) {
+        String nombreUsuario = entrada.getUsername();
+        int rachaNueva = entrada.getRacha();
+
+        // Busca si ya existe el usuario en la colección
+        Bson filtro = Filters.eq("nombreUsuario", nombreUsuario);
+        Document docExistente = rankingCollection.find(filtro).first();
+
+        if (docExistente == null) {
+            // No existe, inserta uno nuevo
+            Document nuevoDoc = new Document("nombreUsuario", nombreUsuario)
+                                    .append("racha", rachaNueva);
+            rankingCollection.insertOne(nuevoDoc);
+        } else {
+            // Existe, comprueba si la nueva racha es mejor
+            int rachaActual = docExistente.getInteger("racha", 0);
+            if (rachaNueva > rachaActual) {
+                // Actualiza solo si la racha es mayor
+                Bson update = Updates.set("racha", rachaNueva);
+                rankingCollection.updateOne(filtro, update);
+            }
+            // Si la racha nueva no es mejor, no haces nada
+        }
+    }
+
+    public RankingService() {
+        // Cambia la URI según tu configuración
+        mongoClient = MongoClients.create("mongodb://root:alumnoalumno@localhost:27017/");
+        database = mongoClient.getDatabase("Ahorcado");
+        rankingCollection = database.getCollection("Ranking");
+    }
+
+    public List<H_RankingEntry> obtenerRanking() {
+        List<H_RankingEntry> lista = new ArrayList<>();
+
+        // Buscar y ordenar por "racha" descendente
+        FindIterable<Document> resultados = rankingCollection.find()
+                .sort(Sorts.descending("racha"));
+
+        for (Document doc : resultados) {
+            String nombreUsuario = doc.getString("nombreUsuario");
+            int racha = doc.getInteger("racha", 0); // si no tiene valor, 0
+            lista.add(new H_RankingEntry(nombreUsuario, racha));
+        }
+        return lista;
+    }
+    public void guardarEntradaRanking(H_RankingEntry entrada) {
+        System.out.println("[RankingService] Guardando racha " + entrada.getRacha() + " para usuario " + entrada.getUsername());
+        if (entrada.getRacha() <= 0) return;
+
+        Document filtro = new Document("nombreUsuario", entrada.getUsername());
+        Document existente = rankingCollection.find(filtro).first();
+
+        if (existente == null) {
+            // No existe aún, insertamos
+            Document nuevo = new Document("nombreUsuario", entrada.getUsername())
+                                    .append("racha", entrada.getRacha());
+            rankingCollection.insertOne(nuevo);
+        } else {
+            int rachaActual = existente.getInteger("racha", 0);
+            if (entrada.getRacha() > rachaActual) {
+                // Solo actualizamos si la racha nueva es mayor
+                Document actualizacion = new Document("$set", new Document("racha", entrada.getRacha()));
+                rankingCollection.updateOne(filtro, actualizacion);
+            }	
+        }
+    }
+
+
+
+    public void cerrarConexion() {
+        if (mongoClient != null) {
+            mongoClient.close();
+        }
+    }
+}
