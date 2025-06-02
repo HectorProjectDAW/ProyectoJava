@@ -32,7 +32,8 @@ public class E_JuegoScreen extends JFrame {
     protected JLabel labelRacha;
 
     protected JTextField textFieldIntento;
-    protected JPanel panelDibujo;
+
+    protected PanelAhorcado panelDibujo;
 
     protected String usuarioActual;
 
@@ -130,13 +131,13 @@ public class E_JuegoScreen extends JFrame {
 
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
-        panelDibujo = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                dibujarAhorcado(g, partida != null ? partida.getLetrasFallidas().size() : 0);
-            }
-        };
+        panelDibujo = new PanelAhorcado();
+        panelDibujo.setBackground(Color.WHITE);
+        getContentPane().add(panelDibujo, BorderLayout.CENTER);
+
+        panelDibujo.setBackground(Color.WHITE);
+        getContentPane().add(panelDibujo, BorderLayout.CENTER);
+
         panelDibujo.setBackground(Color.WHITE);
         getContentPane().add(panelDibujo, BorderLayout.CENTER);
 
@@ -233,6 +234,9 @@ public class E_JuegoScreen extends JFrame {
         if (erroresDespues > erroresAntes) {
             labelErrores.setText("Errores: " + erroresDespues);
             labelFallidas.setText("Letras fallidas: " + partida.getLetrasFallidas().toString().replaceAll("[\\[\\],]", ""));
+            
+            
+            panelDibujo.setIntentosFallidos(erroresDespues);
             panelDibujo.repaint();
 
             if (erroresDespues >= 6) {
@@ -247,6 +251,7 @@ public class E_JuegoScreen extends JFrame {
             }
         }
     }
+
 
     private void rachaTema() {
         rachaPalabras++;
@@ -324,48 +329,4 @@ public class E_JuegoScreen extends JFrame {
         dispose();  
     }
 
-    private void dibujarAhorcado(Graphics g, int errores) {
-        
-        int width = panelDibujo.getWidth();
-        int height = panelDibujo.getHeight();
-
-        int baseY = height - 50;
-        int baseX = width / 2;
-
-        g.setColor(Color.BLACK);
-
-        // Base
-        g.drawLine(baseX - 100, baseY, baseX + 100, baseY);
-        // Poste vertical
-        g.drawLine(baseX - 50, baseY, baseX - 50, baseY - 300);
-        // Poste horizontal superior
-        g.drawLine(baseX - 50, baseY - 300, baseX + 50, baseY - 300);
-        // Cuerda
-        g.drawLine(baseX + 50, baseY - 300, baseX + 50, baseY - 250);
-
-        if (errores > 0) {
-            // Cabeza
-            g.drawOval(baseX + 35, baseY - 250, 30, 30);
-        }
-        if (errores > 1) {
-            // Cuerpo
-            g.drawLine(baseX + 50, baseY - 220, baseX + 50, baseY - 150);
-        }
-        if (errores > 2) {
-            // Brazo izquierdo
-            g.drawLine(baseX + 50, baseY - 210, baseX + 20, baseY - 180);
-        }
-        if (errores > 3) {
-            // Brazo derecho
-            g.drawLine(baseX + 50, baseY - 210, baseX + 80, baseY - 180);
-        }
-        if (errores > 4) {
-            // Pierna izquierda
-            g.drawLine(baseX + 50, baseY - 150, baseX + 20, baseY - 120);
-        }
-        if (errores > 5) {
-            // Pierna derecha
-            g.drawLine(baseX + 50, baseY - 150, baseX + 80, baseY - 120);
-        }
-    }
 }
