@@ -36,7 +36,7 @@ public class E_JuegoScreen extends JFrame {
 
     protected String usuarioActual;
 
-    // Constructor para nueva partida (temática + usuario)
+    
     public E_JuegoScreen(String tematicaSeleccionada, String usuarioActual) {
         this.tematica = tematicaSeleccionada;
         this.usuarioActual = usuarioActual;
@@ -44,17 +44,19 @@ public class E_JuegoScreen extends JFrame {
         cargarNuevaPalabra();
     }
 
-    // Constructor para cargar partida existente
+    
     public E_JuegoScreen(Partida partidaCargada) {
         this.partida = partidaCargada;
         this.tematica = partidaCargada.getTematica();
         this.usuarioActual = partidaCargada.getUser();
+        this.rachaPalabras = partidaCargada.getRacha(); 
         initUI();
         actualizarLabel();
         panelDibujo.repaint();
+        labelRacha.setText("Racha: " + rachaPalabras); 
     }
 
-    // Inicialización común de la interfaz
+   
     private void initUI() {
         setTitle("Ahorcado");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -173,7 +175,7 @@ public class E_JuegoScreen extends JFrame {
                 return;
             }
         }
-        new C_MenuPrincipalScreen().setVisible(true);
+        new C_MenuPrincipalScreen(usuarioActual).setVisible(true);
         dispose();
     }
 
@@ -182,7 +184,7 @@ public class E_JuegoScreen extends JFrame {
                 "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            new C_MenuPrincipalScreen().setVisible(true);
+        	new C_MenuPrincipalScreen(usuarioActual).setVisible(true);
             dispose();
         }
     }
@@ -248,7 +250,15 @@ public class E_JuegoScreen extends JFrame {
 
     private void rachaTema() {
         rachaPalabras++;
+        partida.setRacha(rachaPalabras);
         labelRacha.setText("Racha: " + rachaPalabras);
+
+        // Guardar automáticamente (opcional)
+        try {
+            PartidaDAO.guardarPartida(partida);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         if (rachaPalabras == 5) {
             cambiarTematica();
@@ -257,6 +267,7 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
+
     protected void cargarNuevaPalabra() {
         String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
         if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
@@ -264,7 +275,7 @@ public class E_JuegoScreen extends JFrame {
             dispose();
             return;
         }
-        partida = new Partida(tematica, nuevaPalabra, usuarioActual, new ArrayList<>(), new ArrayList<>(), 0);
+        partida = new Partida(tematica, nuevaPalabra, usuarioActual, new ArrayList<>(), new ArrayList<>(), rachaPalabras);
         panelDibujo.repaint();
         actualizarLabel();
         labelErrores.setText("Errores: 0");
@@ -280,19 +291,23 @@ public class E_JuegoScreen extends JFrame {
 
         for (int i = 0; i < palabra.length(); i++) {
             char c = palabra.charAt(i);
-            if (letrasAdivinadas.contains(c)) {
-                estado.append(c).append(" ");
+
+            if (!Character.isLetter(c)) {
+                // Mostrar directamente espacios, guiones, números, etc.
+                estado.append(c);
+            } else if (letrasAdivinadas.contains(c)) {
+                // Mostrar letras adivinadas en mayúscula
+                estado.append(Character.toUpperCase(c));
             } else {
-                estado.append("_ ");
+                // Mostrar guion bajo para letras no adivinadas
+                estado.append("_");
             }
+            estado.append(" ");  // Espacio entre caracteres para mejor legibilidad
         }
 
         labelPalabra.setText(estado.toString().trim());
-
-        labelErrores.setText("Errores: " + partida.getLetrasFallidas().size());
-        labelFallidas.setText("Letras fallidas: " + partida.getLetrasFallidas().toString().replaceAll("[\\[\\],]", ""));
-        labelRacha.setText("Racha: " + rachaPalabras);
     }
+
 
     private void cambiarTematica() {
         // Reseteamos racha y pedimos otra temática
@@ -303,31 +318,14 @@ public class E_JuegoScreen extends JFrame {
     }
 
     private void finalizarPartidaPerdida() {
-        int opcion = JOptionPane.showOptionDialog(this,
-            "Has perdido la partida. ¿Quieres intentar de nuevo?",
-            "Partida perdida",
-            JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.WARNING_MESSAGE,
-            null,
-            new String[]{"Reintentar", "Salir al menú", "Salir de la aplicación"},
-            "Reintentar");
-
-        if (opcion == JOptionPane.YES_OPTION) {
-            // Reintentar: reiniciar la palabra actual, resetear errores y fallidas
-            rachaPalabras = 0;
-            cargarNuevaPalabra();
-        } else if (opcion == JOptionPane.NO_OPTION) {
-            // Salir al menú principal
-            new C_MenuPrincipalScreen().setVisible(true);
-            dispose();
-        } else if (opcion == JOptionPane.CANCEL_OPTION || opcion == JOptionPane.CLOSED_OPTION) {
-            // Salir de la aplicación
-            System.exit(0);
-        }
+        
+        F_PartidaPerdidaScreen pantallaPerdida = new F_PartidaPerdidaScreen(usuarioActual);
+        pantallaPerdida.setVisible(true);
+        dispose();  
     }
 
     private void dibujarAhorcado(Graphics g, int errores) {
-        // Dibujar el ahorcado según número de errores
+        
         int width = panelDibujo.getWidth();
         int height = panelDibujo.getHeight();
 
