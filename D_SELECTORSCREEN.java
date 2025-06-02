@@ -6,7 +6,6 @@ import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.EventQueue;
 import java.util.List;
-import com.proyecto.mi_proyecto.*;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +16,9 @@ import javax.swing.border.EmptyBorder;
 public class D_SelectorTemasScreen extends JFrame {
 
     private static final long serialVersionUID = 1L;
+
+    private String usuarioActual;
+
     protected JPanel contentPane;
     protected JButton btnTema1, btnTema2, btnTema3;
     protected JLabel lblTema1, lblTema2, lblTema3;
@@ -56,6 +58,7 @@ public class D_SelectorTemasScreen extends JFrame {
         });
     }
 
+    // Constructor sin parámetros (inicializa toda la UI)
     public D_SelectorTemasScreen() {
         // Pantalla completa
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -127,10 +130,11 @@ public class D_SelectorTemasScreen extends JFrame {
 
             // Acción al hacer clic
             botones[i].addActionListener(e -> {
-                E_JuegoScreen juego = new E_JuegoScreen(tema);
+                E_JuegoScreen juego = new E_JuegoScreen(tema, usuarioActual);
                 juego.setVisible(true);
                 dispose();
             });
+
         }
 
         // Botón volver al menú principal, centrado
@@ -141,10 +145,16 @@ public class D_SelectorTemasScreen extends JFrame {
         btnSalirAlMen.setBounds((getToolkit().getScreenSize().width - anchoSalir) / 2,
                                 yEtiquetas + 60, anchoSalir, altoSalir);
         btnSalirAlMen.addActionListener(e -> {
-            C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
+        	C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen(usuarioActual);
             menu.setVisible(true);
             dispose();
         });
         contentPane.add(btnSalirAlMen);
+    }
+
+    // Constructor con usuarioActual para guardar el usuario
+    public D_SelectorTemasScreen(String usuarioActual) {
+        this();  // Llama al constructor sin parámetros para la UI
+        this.usuarioActual = usuarioActual;
     }
 }
