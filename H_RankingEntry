@@ -1,0 +1,19 @@
+package com.proyecto.mi_proyecto;
+
+public class H_RankingEntry {
+    private String username;
+    private int racha;
+
+    public H_RankingEntry(String nombreUsuario, int racha) {
+        this.username = nombreUsuario;
+        this.racha = racha;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getRacha() {
+        return racha;
+    }
+}
