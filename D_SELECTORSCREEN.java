@@ -152,9 +152,9 @@ public class D_SelectorTemasScreen extends JFrame {
         contentPane.add(btnSalirAlMen);
     }
 
-    // Constructor con usuarioActual para guardar el usuario
+   
     public D_SelectorTemasScreen(String usuarioActual) {
-        this();  // Llama al constructor sin parámetros para la UI
+        this();  
         this.usuarioActual = usuarioActual;
     }
 }
