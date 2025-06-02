@@ -3,6 +3,10 @@ package com.proyecto.mi_proyecto;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class A_LoginScreen extends JFrame {
 
@@ -87,33 +91,57 @@ public class A_LoginScreen extends JFrame {
 		});
 		contentPane.add(btnCrearCuenta, gbc);
 	}
+	private long obtenerIdUsuario(String usuario) {
+	    long id = -1;
+	    try (Connection conexion = DriverManager.getConnection(
+	            "jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
+
+	        String query = "SELECT id_usuario FROM Usuarios WHERE nombre_usuario = ?";
+	        try (PreparedStatement ps = conexion.prepareStatement(query)) {
+	            ps.setString(1, usuario);
+	            try (ResultSet rs = ps.executeQuery()) {
+	                if (rs.next()) {
+	                    id = rs.getLong("id_usuario");
+	                }
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return id;
+	}
 
 	
 	//Metodo login
 	private void loginAction(ActionEvent e) {
-		String usuario = textField.getText();
-		String contrasenya = new String(passwordField.getPassword());
+	    String usuario = textField.getText();
+	    String contrasenya = new String(passwordField.getPassword());
 
-		//Rellenar todo
-		if (usuario.isEmpty() || contrasenya.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Complete todos los campos por favor");
-			return;
-		}
+	    if (usuario.isEmpty() || contrasenya.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Complete todos los campos por favor");
+	        return;
+	    }
 
-		//Si no está en base datos
-		if (!User.existeUsuario(usuario)) {
-			JOptionPane.showMessageDialog(this, "Usuario no encontrado");
-			return;
-		}
+	    if (!User.existeUsuario(usuario)) {
+	        JOptionPane.showMessageDialog(this, "Usuario no encontrado");
+	        return;
+	    }
 
-		
-		if (User.validarCredenciales(usuario, contrasenya)) {
-			JOptionPane.showMessageDialog(this, "Inicio de sesión correcto");
-			C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen();
-			menu.setVisible(true);
-			dispose();
-		} else {
-			JOptionPane.showMessageDialog(this, "Contraseña incorrecta");
-		}
+	    if (User.validarCredenciales(usuario, contrasenya)) {
+	        long idUsuario = obtenerIdUsuario(usuario);
+	        if (idUsuario != -1) {
+	            SesionUsuario.setIdUsuario(idUsuario);
+	            User.iniciarSesion(usuario);
+	        }
+
+	        JOptionPane.showMessageDialog(this, "Inicio de sesión correcto");
+	        C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen(usuario);
+	        menu.setVisible(true);
+	        dispose();
+	    } else {
+	        JOptionPane.showMessageDialog(this, "Contraseña incorrecta");
+	    }
 	}
+
+
 }
