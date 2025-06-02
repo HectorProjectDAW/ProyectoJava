@@ -54,7 +54,6 @@ public class F_PartidaPerdidaScreen extends JFrame {
 		gbc.gridy = 2;
 		contentPane.add(btnTienda, gbc);
 
-		
 		JButton btnSalir = new JButton("Salir de la app");
 		btnSalir.setFont(new Font("Dialog", Font.PLAIN, 18));
 		btnSalir.addActionListener(e -> {
