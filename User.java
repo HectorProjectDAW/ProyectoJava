@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class User {
-	
+	private static User usuarioActual = null;
 	private static String username;
 
     public static void iniciarSesion(String usuario) {
@@ -19,6 +19,13 @@ public class User {
     public static void cerrarSesion() {
         username = null;
     }
+    public static void setUsuarioActual(User usuario) {
+        usuarioActual = usuario;
+    }
+
+    public static User getUsuarioActual() {
+        return usuarioActual;
+    }
 
     //Validar user y contraseña
     public static boolean validarCredenciales(String usuario, String contrasenya) {
@@ -26,10 +33,12 @@ public class User {
 
         String hashedPassword = hashPassword(contrasenya);
 
+        //Prueba conexion a mysql a una BDD que se llama Login
         try (Connection conexion = DriverManager.getConnection(
                 "jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
 
-            String checkQuery = "SELECT contrasenya FROM Usuarios WHERE nombre_usuario = ?";
+        	
+            String checkQuery = "SELECT * FROM Usuarios WHERE nombre_usuario = ?";
             try (PreparedStatement statement = conexion.prepareStatement(checkQuery)) {
                 statement.setString(1, usuario);
                 try (ResultSet rs = statement.executeQuery()) {
@@ -45,8 +54,6 @@ public class User {
 
         return false;
     }
-
-
 
     
     //Lo mismo que antes, mira si existe el user
@@ -121,5 +128,4 @@ public class User {
             return null;
         }
     }
-
 }
