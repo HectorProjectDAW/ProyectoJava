@@ -96,12 +96,12 @@ public class A_LoginScreen extends JFrame {
 	    try (Connection conexion = DriverManager.getConnection(
 	            "jdbc:mysql://localhost:33306/Login", "root", "alumnoalumno")) {
 
-	        String query = "SELECT id_usuario FROM Usuarios WHERE nombre_usuario = ?";
+	        String query = "SELECT idusuario FROM Usuarios WHERE nombre_usuario = ?";
 	        try (PreparedStatement ps = conexion.prepareStatement(query)) {
 	            ps.setString(1, usuario);
 	            try (ResultSet rs = ps.executeQuery()) {
 	                if (rs.next()) {
-	                    id = rs.getLong("id_usuario");
+	                    id = rs.getLong("idusuario"); 
 	                }
 	            }
 	        }
@@ -110,6 +110,7 @@ public class A_LoginScreen extends JFrame {
 	    }
 	    return id;
 	}
+
 
 	
 	//Metodo login
