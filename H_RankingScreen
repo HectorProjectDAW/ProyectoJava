@@ -1,0 +1,78 @@
+package com.proyecto.mi_proyecto;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
+@SuppressWarnings("serial")
+public class H_RankingScreen extends JFrame {
+
+    private JTable tablaRanking;
+    private RankingService rankingService;
+
+    public H_RankingScreen() {
+        super("Ranking del Ahorcado");
+        setSize(450, 320);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        rankingService = new RankingService();
+
+        setLayout(new BorderLayout(10, 10));
+
+        // Título simple
+        JLabel titulo = new JLabel("Ranking del Ahorcado", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        add(titulo, BorderLayout.NORTH);
+
+        // Columnas y datos
+        String[] columnas = {"Puesto", "Nombre Usuario", "Racha"};
+        List<H_RankingEntry> listaRanking = rankingService.obtenerRanking();
+
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        int puesto = 1;
+        for (H_RankingEntry entrada : listaRanking) {
+            Object[] fila = {puesto, entrada.getUsername(), entrada.getRacha()};
+            modelo.addRow(fila);
+            puesto++;
+        }
+
+        tablaRanking = new JTable(modelo);
+        tablaRanking.setRowHeight(22);
+        tablaRanking.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        tablaRanking.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        // Centrar solo la columna "Puesto"
+        DefaultTableCellRenderer centrado = new DefaultTableCellRenderer();
+        centrado.setHorizontalAlignment(SwingConstants.CENTER);
+        tablaRanking.getColumnModel().getColumn(0).setCellRenderer(centrado);
+
+        // Filas alternadas color gris claro y blanco
+        tablaRanking.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                                                           Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(230, 230, 230));
+                }
+                return c;
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(tablaRanking);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        add(scrollPane, BorderLayout.CENTER);
+
+        rankingService.cerrarConexion();
+    }
+}
