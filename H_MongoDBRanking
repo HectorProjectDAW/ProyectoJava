@@ -1,0 +1,35 @@
+package com.proyecto.mi_proyecto;
+
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+public class MongoDBRanking {
+    
+    private MongoClient mongoClient;
+    private MongoDatabase database;
+    private MongoCollection<Document> collection;
+
+    public MongoDBRanking() {
+        // Cambia esta URI por la que uses, local o en la nube
+        String uri = "mongodb://root:alumnoalumno@localhost:27017/";
+        mongoClient = MongoClients.create(uri);
+
+        // Nombre de la base de datos
+        database = mongoClient.getDatabase("Ahorcado");
+
+        // Nombre de la colección
+        collection = database.getCollection("Ranking");
+    }
+
+    public MongoCollection<Document> getCollection() {
+        return collection;
+    }
+
+    public void close() {
+        mongoClient.close();
+    }
+}
