@@ -3,6 +3,7 @@ package com.proyecto.mi_proyecto;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.border.EmptyBorder;
 
 public class B_RegisterScreen extends JFrame {
 
@@ -11,6 +12,7 @@ public class B_RegisterScreen extends JFrame {
     private JPasswordField passwordField;
     private JPasswordField repeatPasswordField;
     private JTextField nombreUsuarioField;
+    private JCheckBox consentimientoCheck;
 
     public B_RegisterScreen() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,6 +22,7 @@ public class B_RegisterScreen extends JFrame {
 
         JPanel contentPane = new JPanel(new GridBagLayout());
         contentPane.setBackground(Color.LIGHT_GRAY);
+        contentPane.setBorder(new EmptyBorder(20, 20, 20, 20));
         setContentPane(contentPane);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,15 +84,29 @@ public class B_RegisterScreen extends JFrame {
         repeatPasswordField = new JPasswordField(20);
         contentPane.add(repeatPasswordField, gbc);
 
+        // Checkbox de consentimiento
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
+        consentimientoCheck = new JCheckBox("Acepto la política de privacidad");
+        consentimientoCheck.setBackground(Color.LIGHT_GRAY);
+        contentPane.add(consentimientoCheck, gbc);
+
+        // Botón para ver política de privacidad
+        gbc.gridy = 6;
+        JButton btnPolitica = new JButton("Ver política de privacidad");
+        btnPolitica.addActionListener(e -> mostrarPolitica());
+        contentPane.add(btnPolitica, gbc);
+
+        // Botón de registro
+        gbc.gridy = 7;
         JButton btnRegistrar = new JButton("Registrarse");
         btnRegistrar.addActionListener(this::registroAction);
         contentPane.add(btnRegistrar, gbc);
 
-        gbc.gridy = 6;
+        // Botón volver
+        gbc.gridy = 8;
         JButton btnVolver = new JButton("¿Ya tienes cuenta?");
         btnVolver.addActionListener(e -> {
             A_LoginScreen login = new A_LoginScreen();
@@ -104,6 +121,11 @@ public class B_RegisterScreen extends JFrame {
         String pass1 = new String(passwordField.getPassword());
         String pass2 = new String(repeatPasswordField.getPassword());
         String nombreUsuario = nombreUsuarioField.getText().trim();
+
+        if (!consentimientoCheck.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Debes aceptar la política de privacidad para registrarte.");
+            return;
+        }
 
         if (correo.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || nombreUsuario.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Por favor, rellena todos los campos.");
@@ -145,5 +167,30 @@ public class B_RegisterScreen extends JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Error en el registro.");
         }
+    }
+
+    private void mostrarPolitica() {
+        String mensaje = """
+                POLÍTICA DE PRIVACIDAD
+                -----------------------
+                • Obtenemos tu consentimiento antes de recopilar datos.
+                • Protegemos tu información con cifrado y control de acceso.
+                • Registramos todas las actividades de gestión de datos.
+                • Eliminamos los datos cuando ya no son necesarios.
+                • Responderemos ante cualquier brecha de seguridad.
+                • Puedes solicitar información o eliminación de tus datos en cualquier momento.
+
+                Al registrarte, aceptas esta política.
+                """;
+
+        JTextArea textArea = new JTextArea(mensaje);
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(true);
+        textArea.setEditable(false);
+        textArea.setCaretPosition(0);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 250));
+
+        JOptionPane.showMessageDialog(this, scrollPane, "Política de Privacidad", JOptionPane.INFORMATION_MESSAGE);
     }
 }
