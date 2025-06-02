@@ -33,6 +33,7 @@ Un entorno de desarrollo integrado (IDE) como IntelliJ IDEA o Eclipse.
 Pasos para ejecutar el proyecto
 Clona este repositorio en tu máquina local:
 git clone https://github.com/HectorProjectDAW/ProyectoJava.git
+
 Abre el proyecto en tu IDE favorito.
 Ejecuta la clase A_LOGINSCREEN.java para iniciar la aplicación.
 
