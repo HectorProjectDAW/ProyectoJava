@@ -54,13 +54,17 @@ public class C_MenuPrincipalScreen extends JFrame {
 		panelBotones.add(btnContinuarPartida);
 
 		
-		// Botones sin implementar
-		JButton btnDesafio = crearBoton("Desafío", fuenteBoton, e -> { /* pendiente */ });
+		
+		JButton btnDesafio = crearBoton("Desafío", fuenteBoton, e -> {
+		    PantallaConexion pantallaConexion = new PantallaConexion();
+		    pantallaConexion.setVisible(true);
+		    dispose();
+		});
+
 		panelBotones.add(btnDesafio);
 
-		JButton btnTienda = crearBoton("Tienda", fuenteBoton, e -> { /* pendiente */ });
-		panelBotones.add(btnTienda);
-
+		
+		//FALTA ESTO
 		JButton btnRanking = crearBoton("Ranking", fuenteBoton, e -> { /* pendiente */ });
 		panelBotones.add(btnRanking);
 
