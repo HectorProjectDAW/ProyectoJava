@@ -52,6 +52,7 @@ public class E_JuegoScreen extends JFrame {
         cargarNuevaPalabra();
     }
 
+    //Cuando carga una partida que ya se ha guardado con esos parametros de la clase Partida
     
     public E_JuegoScreen(Partida partidaCargada) {
         this.partida = partidaCargada;
@@ -65,7 +66,7 @@ public class E_JuegoScreen extends JFrame {
 
     }
 
-   
+   //Inicializa el apartado de WindowsBuilder de manera bonita
     private void initUI() {
         setTitle("Ahorcado");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -190,7 +191,7 @@ public class E_JuegoScreen extends JFrame {
 
     }
 
-    // Método para guardar partida y salir al menú principal
+    // Método para guardar partida y salir al menú principal. La guarda en PartidaDAO para despues recuperarla
     private void guardarYSalir() {
         if (partida != null) {
             try {
@@ -217,7 +218,7 @@ public class E_JuegoScreen extends JFrame {
 
 
     
-    
+    //No guarda nada
     private void salirMenu() {
         int confirmacion = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
@@ -230,7 +231,7 @@ public class E_JuegoScreen extends JFrame {
 
     
     
-    
+    //Tampoco guarda nada
     private void salirApp() {
         int res = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir de la aplicación?", "Confirmar salida",
@@ -242,7 +243,7 @@ public class E_JuegoScreen extends JFrame {
 
     
     
-    
+    //Cada palabra es un intento, que se pasa a minuscula todo
     private void procesarIntento() {
         String intento = textFieldIntento.getText().toLowerCase().trim();
         textFieldIntento.setText("");
@@ -259,7 +260,7 @@ public class E_JuegoScreen extends JFrame {
 
     
     
-    
+    //Una palabra entera, que usa otra clase para quitar acentos y pasarlo a minuscula todo
     private void procesarPalabraCompleta(String intento) {
         String intentoNormalizado = partida.quitarAcentos(intento.toLowerCase());
         String palabraNormalizada = partida.quitarAcentos(partida.getPalabra().toLowerCase());
@@ -281,7 +282,7 @@ public class E_JuegoScreen extends JFrame {
     
     
     
-
+    //Tambien procesa las letras en minuscula, mira con cual coincide en la palabra a adivinar, suma errores
     private void procesarLetra(char letra) {
         int erroresAntes = partida.getLetrasFallidas().size();
         partida.intentarLetra(letra);
@@ -312,7 +313,7 @@ public class E_JuegoScreen extends JFrame {
 
 
     
-    
+    //Suma de la racha cada vez que se adivina una palabra. Se guarda en PartidaDAO y UsuarioDAO, para guardar la racha en ambas
     private void rachaTema() {
         rachaPalabras++;
         partida.setRacha(rachaPalabras);
@@ -322,7 +323,7 @@ public class E_JuegoScreen extends JFrame {
             PartidaDAO.guardarPartida(partida);
 
             UsuarioDAO dao = new UsuarioDAO();
-            dao.actualizarRachaVictorias(usuarioActual, rachaPalabras);
+            dao.actualizarRachaVictorias(usuarioActual, 1);
             dao.actualizarPuntuacion(usuarioActual, 10 * rachaPalabras); 
 
             // Obtener la nueva puntuación para mostrarla
@@ -345,6 +346,7 @@ public class E_JuegoScreen extends JFrame {
 
 
 
+    //Carga una palabra de MongoDB de manera aleatoria, e inicializa los errores, letras fallidas y racha
     protected void cargarNuevaPalabra() {
 		String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
 		if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
@@ -361,6 +363,7 @@ public class E_JuegoScreen extends JFrame {
 	}
 
     
+    //Se actualiza lo que hay que adivinar cada intento que el usuario hace
     protected void actualizarLabel() {
 		String palabra = partida.getPalabra().toLowerCase();
 		List<Character> letrasAdivinadas = partida.getLetrasAdivinadas();
@@ -386,7 +389,7 @@ public class E_JuegoScreen extends JFrame {
 
     
     
-    
+    //Cambiar a otra tematica de manera random
     private void cambiarTematica() {
 		List<String> todasLasTematicas = TematicaMongo.obtenerTodas();
 		todasLasTematicas.remove(tematica); 
@@ -410,6 +413,7 @@ public class E_JuegoScreen extends JFrame {
 	}
 
     
+    //Cuando se pierde se guarda en usuariodao y resetea racha a 0
     private void finalizarPartidaPerdida() {
         System.out.println("Finalizando partida para: " + usuarioActual + ", racha: " + rachaPalabras);
 
@@ -417,7 +421,7 @@ public class E_JuegoScreen extends JFrame {
             try {
                 UsuarioDAO dao = new UsuarioDAO();
                 dao.actualizarPartidasJugadas(usuarioActual);
-                dao.actualizarRachaVictorias(usuarioActual, 0); 
+                dao.actualizarRachaVictorias(usuarioActual, -rachaPalabras);  
                 dao.cerrar();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -432,7 +436,6 @@ public class E_JuegoScreen extends JFrame {
             }
         }
 
-        
         rachaPalabras = 0;
         labelRacha.setText("Racha: 0");
 
