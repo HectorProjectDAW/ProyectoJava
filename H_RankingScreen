@@ -12,6 +12,7 @@ public class H_RankingScreen extends JFrame {
     private JTable tablaRanking;
     private RankingService rankingService;
 
+  //hacerlo centrado y bonito, y una tabla tambien bonita, por chatgpt
     public H_RankingScreen() {
         super("Ranking del Ahorcado");
         setSize(450, 320);
