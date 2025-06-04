@@ -24,6 +24,8 @@ public class D_SelectorTemasScreen extends JFrame {
     protected JButton btnTema1, btnTema2, btnTema3;
     protected JLabel lblTema1, lblTema2, lblTema3;
 
+    
+    //Para que las imagenes funcionen bien
     private String convertirImg(String tematica) {
         String nombre = tematica.toLowerCase()
             .replace("á", "a").replace("é", "e").replace("í", "i")
@@ -32,6 +34,7 @@ public class D_SelectorTemasScreen extends JFrame {
         return nombre + ".png";
     }
 
+    //Que se ajsuten a los botones
     private void ajustarEtiqueta(JLabel etiqueta, String texto) {
         Font fuente = etiqueta.getFont();
         FontMetrics fm = etiqueta.getFontMetrics(fuente);
@@ -59,9 +62,9 @@ public class D_SelectorTemasScreen extends JFrame {
         });
     }
 
-    // Constructor sin parámetros (inicializa toda la UI)
+    
     public D_SelectorTemasScreen() {
-        // Pantalla completa
+        // //Manera de chatgpt para que quede bien y centrado
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Selector de Temáticas");
@@ -72,13 +75,13 @@ public class D_SelectorTemasScreen extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        // Título centrado
+        
         JLabel lblTitulo = new JLabel("Selecciona la temática", JLabel.CENTER);
         lblTitulo.setFont(new Font("Dialog", Font.BOLD, 32));
         lblTitulo.setBounds(0, 30, getWidth(), 40);
         contentPane.add(lblTitulo);
 
-        // Crear botones y etiquetas
+        
         btnTema1 = new JButton();
         btnTema2 = new JButton();
         btnTema3 = new JButton();
@@ -89,7 +92,7 @@ public class D_SelectorTemasScreen extends JFrame {
         JButton[] botones = { btnTema1, btnTema2, btnTema3 };
         JLabel[] etiquetas = { lblTema1, lblTema2, lblTema3 };
 
-        // Posiciones centradas horizontalmente
+        
         int anchoBoton = 200;
         int altoBoton = 220;
         int espacio = 60;
@@ -98,13 +101,13 @@ public class D_SelectorTemasScreen extends JFrame {
         int yBotones = 120;
         int yEtiquetas = yBotones + altoBoton + 10;
 
-        // Temáticas
+       
         List<String> tematicas = TematicaMongo.Temas(3);
 
         for (int i = 0; i < tematicas.size(); i++) {
             String tema = tematicas.get(i);
 
-            // Posicionar botones y etiquetas
+           
             int x = xInicial + i * (anchoBoton + espacio);
             botones[i].setBounds(x, yBotones, anchoBoton, altoBoton);
             botones[i].setBorderPainted(false);
@@ -129,7 +132,7 @@ public class D_SelectorTemasScreen extends JFrame {
                 System.err.println("No se encontró la imagen: " + ruta);
             }
 
-            // Acción al hacer clic
+           
             botones[i].addActionListener(e -> {
                 try {
                     UsuarioDAO dao = new UsuarioDAO();
@@ -137,7 +140,7 @@ public class D_SelectorTemasScreen extends JFrame {
                     dao.cerrar();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    // Aquí podrías mostrar un mensaje al usuario si quieres
+                    
                 }
 
                 E_JuegoScreen juego = new E_JuegoScreen(tema, usuarioActual);
@@ -148,7 +151,7 @@ public class D_SelectorTemasScreen extends JFrame {
 
         }
 
-        // Botón volver al menú principal, centrado
+       
         JButton btnSalirAlMen = new JButton("Salir al menú");
         btnSalirAlMen.setFont(new Font("Dialog", Font.PLAIN, 18));
         int anchoSalir = 200;
