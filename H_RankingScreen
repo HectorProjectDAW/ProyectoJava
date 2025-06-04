@@ -22,12 +22,12 @@ public class H_RankingScreen extends JFrame {
 
         setLayout(new BorderLayout(10, 10));
 
-        // Título simple
+        
         JLabel titulo = new JLabel("Ranking del Ahorcado", SwingConstants.CENTER);
         titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
         add(titulo, BorderLayout.NORTH);
 
-        // Columnas y datos
+        
         String[] columnas = {"Puesto", "Nombre Usuario", "Racha"};
         List<H_RankingEntry> listaRanking = rankingService.obtenerRanking();
 
@@ -50,12 +50,12 @@ public class H_RankingScreen extends JFrame {
         tablaRanking.setFont(new Font("SansSerif", Font.PLAIN, 14));
         tablaRanking.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        // Centrar solo la columna "Puesto"
+       
         DefaultTableCellRenderer centrado = new DefaultTableCellRenderer();
         centrado.setHorizontalAlignment(SwingConstants.CENTER);
         tablaRanking.getColumnModel().getColumn(0).setCellRenderer(centrado);
 
-        // Filas alternadas color gris claro y blanco
+    
         tablaRanking.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table,
