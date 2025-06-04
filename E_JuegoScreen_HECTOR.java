@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,12 @@ public class E_JuegoScreen extends JFrame {
     protected PanelAhorcado panelDibujo;
 
     protected String usuarioActual;
+    
+    private long inicioTiempo;
+    private JLabel labelPuntuacion;
+    private int puntuacionActual = 0;
+
+
 
     
     public E_JuegoScreen(String tematicaSeleccionada, String usuarioActual) {
@@ -54,7 +61,8 @@ public class E_JuegoScreen extends JFrame {
         initUI();
         actualizarLabel();
         panelDibujo.repaint();
-        labelRacha.setText("Racha: " + rachaPalabras); 
+        labelRacha.setText("Racha: " + rachaPalabras);
+
     }
 
    
@@ -124,6 +132,12 @@ public class E_JuegoScreen extends JFrame {
         panelInfo.add(labelErrores);
         panelInfo.add(labelFallidas);
         panelInfo.add(labelRacha);
+        
+        labelPuntuacion = new JLabel("Puntuación: " + puntuacionActual);
+        labelPuntuacion.setFont(new Font("Arial", Font.BOLD, 16));
+        labelPuntuacion.setForeground(Color.MAGENTA);
+        panelSuperior.add(labelPuntuacion);
+
 
         panelSuperior.add(labelTematica);
         panelSuperior.add(labelPalabra);
@@ -161,6 +175,19 @@ public class E_JuegoScreen extends JFrame {
         panelInferior.add(btnProbar);
 
         getContentPane().add(panelInferior, BorderLayout.SOUTH);
+        
+        try {
+            UsuarioDAO dao = new UsuarioDAO();
+            puntuacionActual = dao.obtenerPuntuacion(usuarioActual);
+            labelPuntuacion.setText("Puntuación: " + puntuacionActual);
+            dao.cerrar();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        
+        inicioTiempo = System.currentTimeMillis();
+
     }
 
     // Método para guardar partida y salir al menú principal
@@ -169,7 +196,15 @@ public class E_JuegoScreen extends JFrame {
             try {
                 partida.setUser(usuarioActual);
                 PartidaDAO.guardarPartida(partida);
-                JOptionPane.showMessageDialog(this, "Partida guardada correctamente.");
+
+                long tiempoFinal = System.currentTimeMillis();
+                int segundosJugados = (int)((tiempoFinal - inicioTiempo) / 1000);
+
+                UsuarioDAO dao = new UsuarioDAO();
+                dao.actualizarTiempoJugado(usuarioActual, segundosJugados);
+                dao.cerrar();
+
+                JOptionPane.showMessageDialog(this, "Partida guardada y tiempo registrado.");
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage());
                 e.printStackTrace();
@@ -180,6 +215,9 @@ public class E_JuegoScreen extends JFrame {
         dispose();
     }
 
+
+    
+    
     private void salirMenu() {
         int confirmacion = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir al menú principal?", "Confirmar salida",
@@ -190,6 +228,9 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
+    
+    
+    
     private void salirApp() {
         int res = JOptionPane.showConfirmDialog(this,
                 "¿Estás seguro de que quieres salir de la aplicación?", "Confirmar salida",
@@ -199,6 +240,9 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
+    
+    
+    
     private void procesarIntento() {
         String intento = textFieldIntento.getText().toLowerCase().trim();
         textFieldIntento.setText("");
@@ -213,8 +257,14 @@ public class E_JuegoScreen extends JFrame {
         }
     }
 
+    
+    
+    
     private void procesarPalabraCompleta(String intento) {
-        if (intento.equalsIgnoreCase(partida.getPalabra())) {
+        String intentoNormalizado = partida.quitarAcentos(intento.toLowerCase());
+        String palabraNormalizada = partida.quitarAcentos(partida.getPalabra().toLowerCase());
+
+        if (intentoNormalizado.equals(palabraNormalizada)) {
             JOptionPane.showMessageDialog(this, "¡Adivinado!");
             rachaTema();
         } else {
@@ -223,6 +273,14 @@ public class E_JuegoScreen extends JFrame {
             finalizarPartidaPerdida();
         }
     }
+
+
+    
+    
+    
+    
+    
+    
 
     private void procesarLetra(char letra) {
         int erroresAntes = partida.getLetrasFallidas().size();
@@ -253,19 +311,30 @@ public class E_JuegoScreen extends JFrame {
     }
 
 
+    
+    
     private void rachaTema() {
         rachaPalabras++;
         partida.setRacha(rachaPalabras);
         labelRacha.setText("Racha: " + rachaPalabras);
 
-        // Guardar automáticamente (opcional)
         try {
             PartidaDAO.guardarPartida(partida);
+
+            UsuarioDAO dao = new UsuarioDAO();
+            dao.actualizarRachaVictorias(usuarioActual, rachaPalabras);
+            dao.actualizarPuntuacion(usuarioActual, 10 * rachaPalabras); 
+
+            // Obtener la nueva puntuación para mostrarla
+            puntuacionActual = dao.obtenerPuntuacion(usuarioActual);
+            labelPuntuacion.setText("Puntuación: " + puntuacionActual);
+
+            dao.cerrar();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        if (rachaPalabras == 5) {
+        if (rachaPalabras >= 5 && rachaPalabras % 5 == 0) {
             cambiarTematica();
         } else {
             cargarNuevaPalabra();
@@ -273,60 +342,108 @@ public class E_JuegoScreen extends JFrame {
     }
 
 
+
+
+
     protected void cargarNuevaPalabra() {
-        String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
-        if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No hay palabras para la temática: " + tematica);
-            dispose();
-            return;
-        }
-        partida = new Partida(tematica, nuevaPalabra, usuarioActual, new ArrayList<>(), new ArrayList<>(), rachaPalabras);
-        panelDibujo.repaint();
-        actualizarLabel();
-        labelErrores.setText("Errores: 0");
-        labelFallidas.setText("Letras fallidas: ");
-        labelRacha.setText("Racha: " + rachaPalabras);
-    }
+		String nuevaPalabra = TematicaMongo.palabraRandom(tematica);
+		if (nuevaPalabra == null || nuevaPalabra.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No hay palabras para la temática: " + tematica);
+			dispose();
+			return;
+		}
+		partida = new Partida(tematica, nuevaPalabra, usuarioActual, new ArrayList<>(), new ArrayList<>(), rachaPalabras);
+		panelDibujo.repaint();
+		actualizarLabel();
+		labelErrores.setText("Errores: 0");
+		labelFallidas.setText("Letras fallidas: ");
+		labelRacha.setText("Racha: " + rachaPalabras);
+	}
 
+    
     protected void actualizarLabel() {
-        String palabra = partida.getPalabra().toLowerCase();
-        List<Character> letrasAdivinadas = partida.getLetrasAdivinadas();
+		String palabra = partida.getPalabra().toLowerCase();
+		List<Character> letrasAdivinadas = partida.getLetrasAdivinadas();
 
-        StringBuilder estado = new StringBuilder();
+		StringBuilder estado = new StringBuilder();
 
-        for (int i = 0; i < palabra.length(); i++) {
-            char c = palabra.charAt(i);
+		for (int i = 0; i < palabra.length(); i++) {
+			char c = palabra.charAt(i);
 
-            if (!Character.isLetter(c)) {
-                // Mostrar directamente espacios, guiones, números, etc.
-                estado.append(c);
-            } else if (letrasAdivinadas.contains(c)) {
-                // Mostrar letras adivinadas en mayúscula
-                estado.append(Character.toUpperCase(c));
-            } else {
-                // Mostrar guion bajo para letras no adivinadas
-                estado.append("_");
+			if (!Character.isLetter(c)) {
+				estado.append(c);
+			} else if (letrasAdivinadas.contains(partida.quitarAcentos(String.valueOf(c)).charAt(0))) {
+				estado.append(Character.toUpperCase(c));
+			} else {
+				estado.append("_");
+			}
+			estado.append(" ");
+		}
+
+		labelPalabra.setText(estado.toString().trim());
+	}
+
+
+    
+    
+    
+    private void cambiarTematica() {
+		List<String> todasLasTematicas = TematicaMongo.obtenerTodas();
+		todasLasTematicas.remove(tematica); 
+
+		if (todasLasTematicas.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "¡Felicidades! Has completado todas las temáticas.");
+			dispose();
+			new C_MenuPrincipalScreen(usuarioActual).setVisible(true);
+			return;
+		}
+
+		Random rand = new Random();
+		String nuevaTematica = todasLasTematicas.get(rand.nextInt(todasLasTematicas.size()));
+
+		JOptionPane.showMessageDialog(this, "¡Felicidades! Has cambiado a la temática: " + nuevaTematica);
+
+		this.tematica = nuevaTematica;
+		labelTematica.setText("Temática: " + tematica);
+
+		cargarNuevaPalabra();
+	}
+
+    
+    private void finalizarPartidaPerdida() {
+        System.out.println("Finalizando partida para: " + usuarioActual + ", racha: " + rachaPalabras);
+
+        if (usuarioActual != null) {
+            try {
+                UsuarioDAO dao = new UsuarioDAO();
+                dao.actualizarPartidasJugadas(usuarioActual);
+                dao.actualizarRachaVictorias(usuarioActual, 0); 
+                dao.cerrar();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            estado.append(" ");  // Espacio entre caracteres para mejor legibilidad
+
+            if (rachaPalabras > 0) {
+                System.out.println("Guardando racha en ranking...");
+                H_RankingEntry entrada = new H_RankingEntry(usuarioActual, rachaPalabras);
+                RankingService rankingService = new RankingService();
+                rankingService.guardarEntradaRanking(entrada);
+                rankingService.cerrarConexion();
+            }
         }
 
-        labelPalabra.setText(estado.toString().trim());
-    }
-
-
-    private void cambiarTematica() {
-        // Reseteamos racha y pedimos otra temática
-        rachaPalabras = 0;
-        JOptionPane.showMessageDialog(this, "¡Felicidades! Cambiamos de temática.");
-        dispose();
-        new D_SelectorTemasScreen(usuarioActual).setVisible(true);
-    }
-
-    private void finalizarPartidaPerdida() {
         
+        rachaPalabras = 0;
+        labelRacha.setText("Racha: 0");
+
         F_PartidaPerdidaScreen pantallaPerdida = new F_PartidaPerdidaScreen(usuarioActual);
         pantallaPerdida.setVisible(true);
-        dispose();  
+        this.dispose();
     }
+
+
+
+
+
 
 }
