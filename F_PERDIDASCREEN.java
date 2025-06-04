@@ -10,6 +10,7 @@ public class F_PartidaPerdidaScreen extends JFrame {
 	private JPanel contentPane;
 	private String usuarioActual;
 
+	//hacerlo centrado y bonito por chatgpt
 	public F_PartidaPerdidaScreen(String usuarioActual) {
 		this.usuarioActual = usuarioActual;
 
