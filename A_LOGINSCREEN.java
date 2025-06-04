@@ -25,6 +25,8 @@ public class A_LoginScreen extends JFrame {
 		});
 	}
 
+	
+	//Manera de chatgpt para que quede bien y centrado
 	public A_LoginScreen() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -91,6 +93,9 @@ public class A_LoginScreen extends JFrame {
 		});
 		contentPane.add(btnCrearCuenta, gbc);
 	}
+	
+	
+	//Se conecta a la BDD de Login, hace un select y mira si el id del user
 	private long obtenerIdUsuario(String usuario) {
 	    long id = -1;
 	    try (Connection conexion = DriverManager.getConnection(
