@@ -64,8 +64,12 @@ public class C_MenuPrincipalScreen extends JFrame {
 		panelBotones.add(btnDesafio);
 
 		
-		//FALTA ESTO
-		JButton btnRanking = crearBoton("Ranking", fuenteBoton, e -> { /* pendiente */ });
+		
+		JButton btnRanking = crearBoton("Ranking", fuenteBoton, e -> { 
+			H_RankingScreen rankingScreen = new H_RankingScreen();
+		rankingScreen.setVisible(true);});
+			
+	
 		panelBotones.add(btnRanking);
 
 		GridBagConstraints gbcBotones = new GridBagConstraints();
