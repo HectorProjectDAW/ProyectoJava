@@ -1,9 +1,10 @@
 package com.proyecto.mi_proyecto;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 public class Partida {
     protected String tematica;
@@ -25,28 +26,28 @@ public class Partida {
         this.racha = racha;
     }
 
-    protected String getTematica() {
+    public String getTematica() {
         return tematica;
     }
 
-    protected String getPalabra() {
+    public String getPalabra() {
         return palabra;
     }
 
-    protected String getUser() {
+    public String getUser() {
         return user;
     }
 
     
-    protected List<Character> getAciertos() {
+    public List<Character> getAciertos() {
         return new ArrayList<>(aciertos);
     }
 
-    protected List<Character> getLetrasFallidas() {
+    public List<Character> getLetrasFallidas() {
         return new ArrayList<>(letrasFallidas);
     }
 
-    protected int getRacha() {
+    public int getRacha() {
         return racha;
     }
 
@@ -58,7 +59,7 @@ public class Partida {
         this.palabra = palabra;
     }
 
-    protected void setUser(String user) {
+    public void setUser(String user) {
         this.user = user;
     }
 
@@ -70,10 +71,14 @@ public class Partida {
         this.letrasFallidas = new ArrayList<>(letrasFallidas);
     }
 
-    protected void setRacha(int racha) {
+    public void setRacha(int racha) {
         this.racha = racha;
     }
-
+    public String quitarAcentos(String texto) {
+        texto = Normalizer.normalize(texto, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(texto).replaceAll("");
+    }
     @Override
     public String toString() {
         return "Partida{" +
@@ -88,33 +93,38 @@ public class Partida {
 
     public void intentarLetra(char letra) {
         letra = Character.toLowerCase(letra);
-        String minuscula = palabra.toLowerCase();
+        char letraNormalizada = quitarAcentos(String.valueOf(letra)).charAt(0);
+        String palabraNormalizada = quitarAcentos(palabra.toLowerCase());
+        
 
-        if (minuscula.indexOf(letra) >= 0) {
-            if (!aciertos.contains(letra)) {
-                aciertos.add(letra);
+        if (palabraNormalizada.indexOf(letraNormalizada) >= 0) {
+            if (!aciertos.contains(letraNormalizada)) {
+                aciertos.add(letraNormalizada);
                 racha++;
             }
         } else {
-            if (!letrasFallidas.contains(letra)) {
-                letrasFallidas.add(letra);
+            if (!letrasFallidas.contains(letraNormalizada)) {
+                letrasFallidas.add(letraNormalizada);
                 racha = 0;
             }
         }
     }
 
     public boolean palabraCompleta() {
-        for (char c : palabra.toLowerCase().toCharArray()) {
-            if (!aciertos.contains(c)) {
+        String palabraNormalizada = quitarAcentos(palabra.toLowerCase());
+        for (char c : palabraNormalizada.toCharArray()) {
+            if (Character.isLetter(c) && !aciertos.contains(c)) {
                 return false;
             }
         }
         return true;
     }
 
+
     public String mostrarEstadoPalabra() {
         StringBuilder estado = new StringBuilder();
-        for (char c : palabra.toCharArray()) {
+        String palabraNormalizada = quitarAcentos(palabra.toLowerCase());
+        for (char c : palabraNormalizada.toCharArray()) {
             if (aciertos.contains(Character.toLowerCase(c))) {
                 estado.append(c);
             } else {
