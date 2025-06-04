@@ -38,6 +38,17 @@ public class C_MenuPrincipalScreen extends JFrame {
 		gbcTitulo.insets = new Insets(20, 0, 30, 0);
 		contentPane.add(titulo, gbcTitulo);
 
+		JLabel lblUsuario = new JLabel("USUARIO: " + usuarioActual);
+		lblUsuario.setVerticalAlignment(SwingConstants.TOP);
+		lblUsuario.setFont(new Font("Te X Gyre Cursor", Font.BOLD | Font.ITALIC, 26));
+		lblUsuario.setForeground(new Color(80, 80, 80));
+		GridBagConstraints gbcUsuario = new GridBagConstraints();
+		gbcUsuario.gridx = 0;
+		gbcUsuario.gridy = 2;
+		gbcUsuario.insets = new Insets(0, 0, 20, 0);
+		contentPane.add(lblUsuario, gbcUsuario);
+		
+		
 		JPanel panelBotones = new JPanel(new GridLayout(0, 1, 20, 20));
 		panelBotones.setBackground(new Color(255, 255, 255));
 		panelBotones.setBorder(BorderFactory.createEmptyBorder(40, 150, 40, 150));
@@ -74,8 +85,9 @@ public class C_MenuPrincipalScreen extends JFrame {
 		panelBotones.add(btnRanking);
 
 		GridBagConstraints gbcBotones = new GridBagConstraints();
+		gbcBotones.insets = new Insets(0, 0, 5, 0);
 		gbcBotones.gridx = 0;
-		gbcBotones.gridy = 1;
+		gbcBotones.gridy = 4;
 		gbcBotones.anchor = GridBagConstraints.CENTER;
 		contentPane.add(panelBotones, gbcBotones);
 
