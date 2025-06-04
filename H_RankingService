@@ -42,7 +42,7 @@ public class RankingService {
     public RankingService() {
         // Cambia la URI según tu configuración
         mongoClient = MongoClients.create("mongodb://root:alumnoalumno@localhost:27017/");
-        database = mongoClient.getDatabase("Ahorcado");
+        database = mongoClient.getDatabase("AHORCADO_TEMATICA");
         rankingCollection = database.getCollection("Ranking");
     }
 
