@@ -165,10 +165,10 @@ public class DesafioScreen extends JFrame {
             } else if ("GANASTE".equals(mensaje) || "PERDISTE".equals(mensaje)) {
                 letraField.setEnabled(false);
                 enviarLetraBtn.setEnabled(false);
-                // Enviar mensaje para pedir si quieren continuar
+               
                 conexion.enviarMensaje("PEDIR_CONTINUAR");
             } else if ("PEDIR_CONTINUAR".equals(mensaje)) {
-                // Mostrar ventana para preguntar si quiere continuar
+                
                 int resp = JOptionPane.showConfirmDialog(this, "¿Quieres continuar?", "Continuar juego", JOptionPane.YES_NO_OPTION);
                 respuestaPropia = (resp == JOptionPane.YES_OPTION);
                 conexion.enviarMensaje("RESPUESTA_CONTINUAR:" + (respuestaPropia ? "SI" : "NO"));
