@@ -19,7 +19,7 @@ public class MongoDBRanking {
         mongoClient = MongoClients.create(uri);
 
         // Nombre de la base de datos
-        database = mongoClient.getDatabase("Ahorcado");
+        database = mongoClient.getDatabase("AHORCADO_TEMATICA");
 
         // Nombre de la colección
         collection = database.getCollection("Ranking");
