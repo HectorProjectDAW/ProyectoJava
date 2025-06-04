@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
+//Guardar tematica, palabra, user, etc y todo eso para despues recuperarlo cuando se le da a continuar partida
 public class Partida {
     protected String tematica;
     protected String palabra;
@@ -91,6 +92,7 @@ public class Partida {
             '}';
     }
 
+    //Intento de ltra 
     public void intentarLetra(char letra) {
         letra = Character.toLowerCase(letra);
         char letraNormalizada = quitarAcentos(String.valueOf(letra)).charAt(0);
@@ -110,6 +112,7 @@ public class Partida {
         }
     }
 
+    //Intento de palabra
     public boolean palabraCompleta() {
         String palabraNormalizada = quitarAcentos(palabra.toLowerCase());
         for (char c : palabraNormalizada.toCharArray()) {
@@ -121,6 +124,7 @@ public class Partida {
     }
 
 
+    //Como va la palabra, lo que queda por adivinar
     public String mostrarEstadoPalabra() {
         StringBuilder estado = new StringBuilder();
         String palabraNormalizada = quitarAcentos(palabra.toLowerCase());
@@ -135,6 +139,8 @@ public class Partida {
         return estado.toString().trim();
     }
 
+    
+    
     public List<Character> getLetrasAdivinadas() {
         return new ArrayList<>(aciertos);
     }
