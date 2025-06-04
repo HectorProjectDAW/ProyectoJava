@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Image;
+import java.sql.SQLException;
 import java.awt.EventQueue;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -130,10 +131,20 @@ public class D_SelectorTemasScreen extends JFrame {
 
             // Acción al hacer clic
             botones[i].addActionListener(e -> {
+                try {
+                    UsuarioDAO dao = new UsuarioDAO();
+                    dao.resetearEstadisticas(usuarioActual);
+                    dao.cerrar();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    // Aquí podrías mostrar un mensaje al usuario si quieres
+                }
+
                 E_JuegoScreen juego = new E_JuegoScreen(tema, usuarioActual);
                 juego.setVisible(true);
                 dispose();
             });
+
 
         }
 
