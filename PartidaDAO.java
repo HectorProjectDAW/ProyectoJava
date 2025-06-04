@@ -6,6 +6,8 @@ import java.util.List;
 
 public class PartidaDAO {
 
+	
+	//tener conexion a sql
     private static final String URL = "jdbc:mysql://localhost:33306/Login";
     private static final String USER = "root";
     private static final String PASS = "alumnoalumno";
@@ -16,7 +18,7 @@ public class PartidaDAO {
             String aciertosStr = listaAString(partida.getAciertos());
             String fallidasStr = listaAString(partida.getLetrasFallidas());
 
-            // Intentar UPDATE primero
+            // Intentar UPDATE primero de tematica, palabra...
             String sqlUpdate = "UPDATE Partidas SET tematica=?, palabra=?, aciertos=?, letrasfallidas=?, racha=? WHERE usuario=?";
             PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
             psUpdate.setString(1, partida.getTematica());
@@ -42,6 +44,8 @@ public class PartidaDAO {
         }
     }
 
+    
+    //Carga la partida con todas las cosas que se han guardado en la base de datos
     public static Partida cargarPartida(String usuario) throws SQLException {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS)) {
             String sql = "SELECT * FROM Partidas WHERE usuario=?";
