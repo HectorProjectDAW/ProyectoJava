@@ -16,6 +16,7 @@ public class C_MenuPrincipalScreen extends JFrame {
 	public C_MenuPrincipalScreen(String usuarioActual) {
 		this.usuarioActual = usuarioActual;
 
+		//Manera de chatgpt para que quede bien y centrado
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -113,6 +114,7 @@ public class C_MenuPrincipalScreen extends JFrame {
 		return boton;
 	}
 
+	//Desde PartidaDAO carga la partida del usuario que haya hecho login
 	private void continuarPartidaGuardada() {
 		try {
 			Partida partidaGuardada = PartidaDAO.cargarPartida(usuarioActual);
