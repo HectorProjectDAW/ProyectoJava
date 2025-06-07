@@ -170,18 +170,16 @@ public class B_RegisterScreen extends JFrame {
     }
 
     private void mostrarPolitica() {
-        String mensaje = """
-                POLÍTICA DE PRIVACIDAD
-                -----------------------
-                • Obtenemos tu consentimiento antes de recopilar datos.
-                • Protegemos tu información con cifrado y control de acceso.
-                • Registramos todas las actividades de gestión de datos.
-                • Eliminamos los datos cuando ya no son necesarios.
-                • Responderemos ante cualquier brecha de seguridad.
-                • Puedes solicitar información o eliminación de tus datos en cualquier momento.
-
-                Al registrarte, aceptas esta política.
-                """;
+        String mensaje = "POLÍTICA DE PRIVACIDAD\r\n"
+        		+ "                -----------------------\r\n"
+        		+ "                • Obtenemos tu consentimiento antes de recopilar datos.\r\n"
+        		+ "                • Protegemos tu información con cifrado y control de acceso.\r\n"
+        		+ "                • Registramos todas las actividades de gestión de datos.\r\n"
+        		+ "                • Eliminamos los datos cuando ya no son necesarios.\r\n"
+        		+ "                • Responderemos ante cualquier brecha de seguridad.\r\n"
+        		+ "                • Puedes solicitar información o eliminación de tus datos en cualquier momento.\r\n"
+        		+ "\r\n"
+        		+ "                Al registrarte, aceptas esta política.";
 
         JTextArea textArea = new JTextArea(mensaje);
         textArea.setWrapStyleWord(true);
