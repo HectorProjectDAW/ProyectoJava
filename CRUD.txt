@@ -1,0 +1,57 @@
+use AHORCADO_TEMATICA
+
+db.categorias.insertMany([
+  {
+    "nombre": "Peliculas de Disney",
+    "palabras": ["Aladdin", "Frozen", "Enredados", "Bambi", "Dumbo", "Moana", "Hércules", "Tarzán", "Cenicienta", "Mulan", "Pocahontas", "Ratatouille", "Brave", "Encanto", "Luca", "Zootopia", "Soul", "Coco", "Baymax", "Pinocchio", "Blancanieves", "Peter Pan", "Robin Hood", "Atlantis", "Los Increíbles", "Toy Story", "Cars", "Up", "Wall-E", "Bolt", "Tiana", "Winnie Pooh", "Rey León", "Aristogatos", "Big Hero 6", "Raya", "Wish", "El Jorobado", "101 Dálmatas", "La Dama y el Vagabundo", "La Sirenita", "Los Tres Caballeros", "Saludos Amigos", "Fantasia", "La Bella Durmiente", "Alicia", "La Bella y la Bestia", "Oliver y su Pandilla", "Chicken Little", "Home on the Range"]
+  },
+  {
+    "nombre": "Paises de Europa",
+    "palabras": ["España", "Francia", "Italia", "Alemania", "Portugal", "Grecia", "Países Bajos", "Bélgica", "Suiza", "Austria", "Suecia", "Noruega", "Finlandia", "Dinamarca", "Irlanda", "Reino Unido", "Polonia", "Hungría", "República Checa", "Eslovaquia", "Eslovenia", "Croacia", "Bosnia", "Serbia", "Montenegro", "Kosovo", "Albania", "Macedonia", "Bulgaria", "Rumanía", "Ucrania", "Bielorrusia", "Lituania", "Letonia", "Estonia", "Islandia", "Malta", "Andorra", "San Marino", "Liechtenstein", "Mónaco", "Luxemburgo", "Vaticano", "Georgia", "Armenia", "Azerbaiyán", "Turquía", "Rusia", "Moldavia", "Chipre"]
+  }
+  // Se continuaría agregando el resto
+])
+
+-- Leer todos los documentos
+db.categorias.find().pretty()
+
+-- Buscar una categoría por nombre
+db.categorias.find({ nombre: "Peliculas de Disney" })
+
+-- Buscar palabras que contengan "Harry Potter"
+db.categorias.find({ palabras: { $in: ["Harry Potter"] } })
+
+-- Contar cuántas categorías hay
+db.categorias.countDocuments()
+
+
+-- Agregar una palabra a una categoría
+db.categorias.updateOne(
+  { nombre: "Peliculas de Disney" },
+  { $push: { palabras: "Wish Dragon" } }
+)
+
+-- Reemplazar todas las palabras de una categoría
+db.categorias.updateOne(
+  { nombre: "Peliculas de Disney" },
+  { $set: { palabras: ["Nueva", "Lista", "De", "Peliculas"] } }
+)
+
+-- Cambiar el nombre de una categoría
+db.categorias.updateOne(
+  { nombre: "Peliculas de Disney" },
+  { $set: { nombre: "Películas Clásicas de Disney" } }
+)
+
+
+-- Eliminar una categoría entera
+db.categorias.deleteOne({ nombre: "Villanos de videojuegos" })
+
+-- Eliminar todas las categorías
+db.categorias.deleteMany({})
+
+-- Eliminar una palabra específica de una categoría
+db.categorias.updateOne(
+  { nombre: "Peliculas de Disney" },
+  { $pull: { palabras: "Aladdin" } }
+)
