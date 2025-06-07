@@ -1,3 +1,4 @@
+// DesafioScreen.java
 package com.proyecto.mi_proyecto;
 
 import javax.swing.*;
@@ -23,10 +24,6 @@ public class DesafioScreen extends JFrame {
     private JLabel palabraOcultaLabel;
     private JTextArea logArea;
     private PanelAhorcado panelAhorcado;
-
-    // Variables para controlar la sincronización de la continuación
-    private Boolean respuestaPropia = null;   // null: sin responder; true: sí; false: no
-    private Boolean respuestaOponente = null;
 
     public DesafioScreen(String palabra, int puerto, String ip, boolean esServidor) {
         this.palabra = palabra.toUpperCase();
@@ -88,10 +85,7 @@ public class DesafioScreen extends JFrame {
         if (esServidor) {
             palabraSecreta = palabra;
             palabraOculta = ocultarPalabra(palabraSecreta);
-
-            // Mostrar palabra completa al servidor
             palabraOcultaLabel.setText(palabraSecreta + " (Palabra seleccionada)");
-
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
 
@@ -162,25 +156,14 @@ public class DesafioScreen extends JFrame {
                 } catch (NumberFormatException e) {
                     log("Error al parsear INTENTOS");
                 }
-            } else if ("GANASTE".equals(mensaje) || "PERDISTE".equals(mensaje)) {
+            } else if ("GANASTE".equals(mensaje)) {
+                JOptionPane.showMessageDialog(this, "¡Ganaste!", "Fin", JOptionPane.INFORMATION_MESSAGE);
                 letraField.setEnabled(false);
                 enviarLetraBtn.setEnabled(false);
-               
-                conexion.enviarMensaje("PEDIR_CONTINUAR");
-            } else if ("PEDIR_CONTINUAR".equals(mensaje)) {
-                
-                int resp = JOptionPane.showConfirmDialog(this, "¿Quieres continuar?", "Continuar juego", JOptionPane.YES_NO_OPTION);
-                respuestaPropia = (resp == JOptionPane.YES_OPTION);
-                conexion.enviarMensaje("RESPUESTA_CONTINUAR:" + (respuestaPropia ? "SI" : "NO"));
-                comprobarRespuestasContinuar();
-            } else if (mensaje.startsWith("RESPUESTA_CONTINUAR:")) {
-                String val = mensaje.substring("RESPUESTA_CONTINUAR:".length());
-                respuestaOponente = val.equalsIgnoreCase("SI");
-                comprobarRespuestasContinuar();
-            } else if ("CAMBIAR_ROL".equals(mensaje)) {
-                cerrarConexion();
-                dispose();
-                cambiarRol();
+            } else if ("PERDISTE".equals(mensaje)) {
+                JOptionPane.showMessageDialog(this, "Perdiste. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
+                letraField.setEnabled(false);
+                enviarLetraBtn.setEnabled(false);
             } else {
                 if (esServidor) {
                     if (mensaje.length() == 1) {
@@ -191,23 +174,6 @@ public class DesafioScreen extends JFrame {
                 }
             }
         });
-    }
-
-    private void comprobarRespuestasContinuar() {
-        if (respuestaPropia != null && respuestaOponente != null) {
-            if (respuestaPropia && respuestaOponente) {
-                
-                conexion.enviarMensaje("CAMBIAR_ROL");
-            } else {
-                
-                JOptionPane.showMessageDialog(this, "El otro jugador no quiere continuar. Cerrando juego.", "Fin", JOptionPane.INFORMATION_MESSAGE);
-                cerrarConexion();
-                System.exit(0);
-            }
-            
-            respuestaPropia = null;
-            respuestaOponente = null;
-        }
     }
 
     private void procesarLetra(char letra) {
@@ -245,7 +211,6 @@ public class DesafioScreen extends JFrame {
             palabraOcultaLabel.setText(palabraSecreta + " (Palabra seleccionada)");
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
-            conexion.enviarMensaje("CAMBIAR_ROL");
         } else {
             intentosFallidos++;
             conexion.enviarMensaje("INTENTOS:" + intentosFallidos);
@@ -254,7 +219,8 @@ public class DesafioScreen extends JFrame {
             if (intentosFallidos >= MAX_INTENTOS) {
                 conexion.enviarMensaje("PERDISTE");
                 JOptionPane.showMessageDialog(this, "Perdiste. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
-                conexion.enviarMensaje("CAMBIAR_ROL");
+                letraField.setEnabled(false);
+                enviarLetraBtn.setEnabled(false);
             }
         }
     }
@@ -265,13 +231,11 @@ public class DesafioScreen extends JFrame {
             JOptionPane.showMessageDialog(this, "¡Ganaste!", "Fin", JOptionPane.INFORMATION_MESSAGE);
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
-           
         } else if (intentosFallidos >= MAX_INTENTOS) {
             conexion.enviarMensaje("PERDISTE");
             JOptionPane.showMessageDialog(this, "Perdiste. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
-           
         }
     }
 
@@ -289,43 +253,6 @@ public class DesafioScreen extends JFrame {
 
     private void log(String texto) {
         logArea.append(texto + "\n");
-    }
-
-    private void cambiarRol() {
-        boolean nuevoEsServidor = !this.esServidor;
-        String nuevaPalabra = "";
-
-        if (nuevoEsServidor) {
-            while (true) {
-                String input = JOptionPane.showInputDialog(null,
-                        "Ingresa la nueva palabra secreta (puede contener letras, números o símbolos):",
-                        "Nueva palabra",
-                        JOptionPane.QUESTION_MESSAGE);
-                if (input == null) System.exit(0);
-                input = input.trim().toUpperCase();
-                if (!input.isEmpty()) {
-                    nuevaPalabra = input;
-                    break;
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "La palabra no puede estar vacía.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-
-        String palabraFinal = nuevaPalabra;
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ignored) {}
-            SwingUtilities.invokeLater(() -> {
-                DesafioScreen nuevoJuego = new DesafioScreen(palabraFinal, puerto, ip, nuevoEsServidor);
-                nuevoJuego.setVisible(true);
-            });
-        }).start();
     }
 
     private void cerrarConexion() {
