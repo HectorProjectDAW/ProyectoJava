@@ -79,6 +79,17 @@ public class A_LoginScreen extends JFrame {
 		JButton btnContinuar = new JButton("Continuar");
 		btnContinuar.addActionListener(this::loginAction);
 		contentPane.add(btnContinuar, gbc);
+		
+		gbc.gridy = 6;
+		JButton btnInvitado = new JButton("Continuar sin iniciar sesión");
+		btnInvitado.addActionListener(e -> {
+		    JOptionPane.showMessageDialog(this, "Has iniciado como invitado. No se guardarán datos.");
+		    C_MenuPrincipalScreen menu = new C_MenuPrincipalScreen("Invitado");
+		    menu.setVisible(true);
+		    dispose();
+		});
+		contentPane.add(btnInvitado, gbc);
+
 
 		gbc.gridy = 4;
 		JLabel lblNoTienesCuenta = new JLabel("¿No tienes cuenta?");
