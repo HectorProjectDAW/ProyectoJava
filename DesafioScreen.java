@@ -24,6 +24,8 @@ public class DesafioScreen extends JFrame {
     private JLabel palabraOcultaLabel;
     private JTextArea logArea;
     private PanelAhorcado panelAhorcado;
+    
+    private String usuarioActual;
 
     public DesafioScreen(String palabra, int puerto, String ip, boolean esServidor) {
         this.palabra = palabra.toUpperCase();
@@ -154,16 +156,22 @@ public class DesafioScreen extends JFrame {
                     panelAhorcado.setIntentosFallidos(intentosFallidos);
                     panelAhorcado.repaint();
                 } catch (NumberFormatException e) {
-                    log("Error al parsear INTENTOS");
+                    log("Error al hacer INTENTOS");
                 }
             } else if ("GANASTE".equals(mensaje)) {
                 JOptionPane.showMessageDialog(this, "¡Ganaste!", "Fin", JOptionPane.INFORMATION_MESSAGE);
                 letraField.setEnabled(false);
                 enviarLetraBtn.setEnabled(false);
+                A_LoginScreen login = new A_LoginScreen();
+                login.setVisible(true);
+                dispose();
             } else if ("PERDISTE".equals(mensaje)) {
                 JOptionPane.showMessageDialog(this, "Perdiste. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
                 letraField.setEnabled(false);
                 enviarLetraBtn.setEnabled(false);
+                A_LoginScreen login = new A_LoginScreen();
+                login.setVisible(true);
+                dispose();
             } else {
                 if (esServidor) {
                     if (mensaje.length() == 1) {
@@ -228,12 +236,12 @@ public class DesafioScreen extends JFrame {
     private void comprobarFinJuego() {
         if (!palabraOculta.contains("_")) {
             conexion.enviarMensaje("GANASTE");
-            JOptionPane.showMessageDialog(this, "¡Ganaste!", "Fin", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "¡Ganaste, cerrando el desafío!", "Fin", JOptionPane.INFORMATION_MESSAGE);
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
         } else if (intentosFallidos >= MAX_INTENTOS) {
             conexion.enviarMensaje("PERDISTE");
-            JOptionPane.showMessageDialog(this, "Perdiste. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Perdiste. Se cerrará el desafío. La palabra era: " + palabraSecreta, "Fin", JOptionPane.INFORMATION_MESSAGE);
             letraField.setEnabled(false);
             enviarLetraBtn.setEnabled(false);
         }
