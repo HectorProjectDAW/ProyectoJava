@@ -44,7 +44,7 @@ public class A_LoginScreen extends JFrame {
 
     @SuppressWarnings("deprecation")
 	public A_LoginScreen() {
-        // Obtener locale actual de Messages (que carga idioma por defecto o el último seleccionado)
+        //Idioma por defecto o el que escoja
         this.currentLocale = Messages.getCurrentLocale();
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,7 +59,7 @@ public class A_LoginScreen extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Combo selector idioma
+        
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
@@ -67,7 +67,7 @@ public class A_LoginScreen extends JFrame {
 
         comboIdiomas = new JComboBox<>(new String[]{"Español", "English"});
         
-        // Inicializar el combo según locale actual
+        //Inicializar segun el idioma
         if ("en".equals(currentLocale.getLanguage())) {
             comboIdiomas.setSelectedIndex(1);
         } else {
@@ -86,14 +86,14 @@ public class A_LoginScreen extends JFrame {
         });
         contentPane.add(comboIdiomas, gbc);
 
-        // Label Login
+        
         gbc.gridy = 1;
         JLabel lblLogin = new JLabel("LOGIN");
         lblLogin.setFont(new Font("Dialog", Font.BOLD, 26));
         lblLogin.setForeground(Color.BLACK);
         contentPane.add(lblLogin, gbc);
 
-        // Campos usuario y contraseña
+        
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
 
@@ -120,7 +120,7 @@ public class A_LoginScreen extends JFrame {
         passwordField = new JPasswordField(20);
         contentPane.add(passwordField, gbc);
 
-        // Botón continuar
+        
         gbc.gridy = 4;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
@@ -129,12 +129,12 @@ public class A_LoginScreen extends JFrame {
         btnContinuar.addActionListener(this::loginAction);
         contentPane.add(btnContinuar, gbc);
 
-        // Label "¿No tienes cuenta?"
+        
         gbc.gridy = 5;
         lblNoTienesCuenta = new JLabel("¿No tienes cuenta?");
         contentPane.add(lblNoTienesCuenta, gbc);
 
-        // Botón crear cuenta
+        
         gbc.gridy = 6;
         btnCrearCuenta = new JButton("Crear cuenta");
         btnCrearCuenta.addActionListener(e -> {
@@ -144,7 +144,7 @@ public class A_LoginScreen extends JFrame {
         });
         contentPane.add(btnCrearCuenta, gbc);
 
-        // Botón continuar sin iniciar sesión
+        
         gbc.gridy = 7;
         btnInvitado = new JButton("Continuar sin iniciar sesión");
         btnInvitado.addActionListener(e -> {
@@ -183,7 +183,7 @@ public class A_LoginScreen extends JFrame {
         }
     }
 
-    // Método login
+    // Método login que usa la clase User
     private void loginAction(ActionEvent e) {
         String usuario = textField.getText();
         String contrasenya = new String(passwordField.getPassword());
@@ -215,6 +215,7 @@ public class A_LoginScreen extends JFrame {
         }
     }
 
+    //Obtener id del usuario con el nombre de usuario
     private long obtenerIdUsuario(String usuario) {
         long id = -1;
         try (Connection conexion = DriverManager.getConnection(
