@@ -31,6 +31,7 @@ public class B_RegisterScreen extends JFrame {
     @SuppressWarnings("deprecation")
 	public B_RegisterScreen() {
         
+    	//Manera bonita de chatgpt para los botones
         this.currentLocale = Messages.getCurrentLocale();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -101,7 +102,7 @@ public class B_RegisterScreen extends JFrame {
         repeatPasswordField = new JPasswordField(20);
         contentPane.add(repeatPasswordField, gbc);
 
-        // Checkbox de consentimiento
+        
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
@@ -110,19 +111,19 @@ public class B_RegisterScreen extends JFrame {
         consentimientoCheck.setBackground(Color.LIGHT_GRAY);
         contentPane.add(consentimientoCheck, gbc);
 
-        // Botón para ver política de privacidad
+        
         gbc.gridy = 6;
         btnPolitica = new JButton("Ver política de privacidad");
         btnPolitica.addActionListener(e -> mostrarPolitica());
         contentPane.add(btnPolitica, gbc);
 
-        // Botón de registro
+        
         gbc.gridy = 7;
         btnRegistrar = new JButton("Registrarse");
         btnRegistrar.addActionListener(this::registroAction);
         contentPane.add(btnRegistrar, gbc);
 
-        // Botón volver
+        
         gbc.gridy = 8;
         btnVolver = new JButton("¿Ya tienes cuenta?");
         btnVolver.addActionListener(e -> {
@@ -152,7 +153,7 @@ public class B_RegisterScreen extends JFrame {
     }
     private void cambiarIdioma(Locale locale) {
         this.currentLocale = locale;
-        Messages.loadLocale(locale); // Establece idioma global
+        Messages.loadLocale(locale);
         actualizarTextos();
     }
 
@@ -160,46 +161,44 @@ public class B_RegisterScreen extends JFrame {
     private void registroAction(ActionEvent e) {
         ResourceBundle bundle = Messages.labels();
 
+        //Guardar los datos
         String correo = correoField.getText().trim();
         String pass1 = new String(passwordField.getPassword());
         String pass2 = new String(repeatPasswordField.getPassword());
         String nombreUsuario = nombreUsuarioField.getText().trim();
 
+        //Tiene q aceptar antes
         if (!consentimientoCheck.isSelected()) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.accept_policy"));
             return;
         }
-
+        //Q no esté vacío
         if (correo.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || nombreUsuario.isEmpty()) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.fill_fields"));
             return;
         }
-
+        //Q las contraseñas coincidan
         if (!pass1.equals(pass2)) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.password_mismatch"));
             return;
         }
-
+        //Minimo 6 caracteres
         if (pass1.length() < 6) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.password_short"));
             return;
         }
-
+        //Que tenga una @ y un . en ese orden
         if (!correo.contains("@") || !correo.contains(".") || correo.startsWith("@") || correo.endsWith(".")) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.invalid_email"));
             return;
         }
-
-        if (User.existeCorreo(correo)) {
-            JOptionPane.showMessageDialog(null, bundle.getString("message.email_exists"));
-            return;
-        }
-
+        //Que no exista el nombre usuario
         if (User.existeUsuario(nombreUsuario)) {
             JOptionPane.showMessageDialog(null, bundle.getString("message.username_exists"));
             return;
         }
 
+        //Mete al usuario en la tabla
         boolean exito = User.registrarUsuario(nombreUsuario, correo, pass1);
 
         if (exito) {
