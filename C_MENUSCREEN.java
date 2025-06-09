@@ -23,6 +23,8 @@ public class C_MenuPrincipalScreen extends JFrame {
     private JComboBox<String> comboIdioma;
 
     @SuppressWarnings("deprecation")
+    
+    //Manera de ordenar los botones de manera bonita de chatgpt
 	public C_MenuPrincipalScreen(String usuarioActual) {
         this.usuarioActual = usuarioActual;
 
@@ -111,7 +113,7 @@ public class C_MenuPrincipalScreen extends JFrame {
         gbcInferior.insets = new Insets(40, 0, 0, 0);
         contentPane.add(panelInferior, gbcInferior);
 
-        // Combo para selección idioma - lo posicionamos arriba a la derecha
+        // arriba a la derecha el idioma
         comboIdioma = new JComboBox<>(new String[]{"Español", "English"});
         comboIdioma.setSelectedIndex(currentLocale.getLanguage().equals("en") ? 1 : 0);
         comboIdioma.addActionListener(e -> {
@@ -132,7 +134,7 @@ public class C_MenuPrincipalScreen extends JFrame {
 
     private void cambiarIdioma(Locale locale) {
         this.currentLocale = locale;
-        Messages.loadLocale(locale); // Establece idioma global
+        Messages.loadLocale(locale); 
         actualizarTextos();
     }
 
@@ -160,7 +162,7 @@ public class C_MenuPrincipalScreen extends JFrame {
         btnSalir.setText(bundle.getString("button.salir"));
     }
 
-    //Cargar cosas desde PartidaDAO
+    //Cargar cosas desde PartidaDAO, y si no, modo invitado
     private void continuarPartidaGuardada() {
         if ("Invitado".equalsIgnoreCase(usuarioActual)) {
             JOptionPane.showMessageDialog(this, "No se pueden cargar partidas guardadas en modo Invitado.", "Información", JOptionPane.INFORMATION_MESSAGE);
