@@ -3,6 +3,9 @@ package com.proyecto.mi_proyecto;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.swing.border.EmptyBorder;
 
 public class B_RegisterScreen extends JFrame {
@@ -12,9 +15,23 @@ public class B_RegisterScreen extends JFrame {
     private JPasswordField passwordField;
     private JPasswordField repeatPasswordField;
     private JTextField nombreUsuarioField;
+    private JLabel lblRegistro;
+    private JLabel lblNombreUsuario;
+    private JLabel lblCorreo;
+    private JLabel lblContrasena;
+    private JLabel lblRepetir;
     private JCheckBox consentimientoCheck;
+    private JButton btnPolitica;
+    private JButton btnRegistrar;
+    private JButton btnVolver;
+    private JComboBox<String> comboIdioma;
+    private Locale currentLocale;
 
-    public B_RegisterScreen() {
+
+    @SuppressWarnings("deprecation")
+	public B_RegisterScreen() {
+        
+        this.currentLocale = Messages.getCurrentLocale();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize.width, screenSize.height);
@@ -31,7 +48,7 @@ public class B_RegisterScreen extends JFrame {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        JLabel lblRegistro = new JLabel("REGISTRO");
+        lblRegistro = new JLabel("REGISTRO");
         lblRegistro.setFont(new Font("Dialog", Font.BOLD, 26));
         lblRegistro.setForeground(Color.BLACK);
         contentPane.add(lblRegistro, gbc);
@@ -39,7 +56,7 @@ public class B_RegisterScreen extends JFrame {
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel lblNombreUsuario = new JLabel("Nombre de usuario:");
+        lblNombreUsuario = new JLabel("Nombre de usuario:");
         lblNombreUsuario.setFont(new Font("Dialog", Font.PLAIN, 16));
         contentPane.add(lblNombreUsuario, gbc);
 
@@ -51,7 +68,7 @@ public class B_RegisterScreen extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel lblCorreo = new JLabel("Correo electrónico:");
+        lblCorreo = new JLabel("Correo electrónico:");
         lblCorreo.setFont(new Font("Dialog", Font.PLAIN, 16));
         contentPane.add(lblCorreo, gbc);
 
@@ -63,7 +80,7 @@ public class B_RegisterScreen extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel lblContrasena = new JLabel("Contraseña:");
+        lblContrasena = new JLabel("Contraseña:");
         lblContrasena.setFont(new Font("Dialog", Font.PLAIN, 16));
         contentPane.add(lblContrasena, gbc);
 
@@ -75,7 +92,7 @@ public class B_RegisterScreen extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.EAST;
-        JLabel lblRepetir = new JLabel("Repetir contraseña:");
+        lblRepetir = new JLabel("Repetir contraseña:");
         lblRepetir.setFont(new Font("Dialog", Font.PLAIN, 16));
         contentPane.add(lblRepetir, gbc);
 
@@ -95,100 +112,138 @@ public class B_RegisterScreen extends JFrame {
 
         // Botón para ver política de privacidad
         gbc.gridy = 6;
-        JButton btnPolitica = new JButton("Ver política de privacidad");
+        btnPolitica = new JButton("Ver política de privacidad");
         btnPolitica.addActionListener(e -> mostrarPolitica());
         contentPane.add(btnPolitica, gbc);
 
         // Botón de registro
         gbc.gridy = 7;
-        JButton btnRegistrar = new JButton("Registrarse");
+        btnRegistrar = new JButton("Registrarse");
         btnRegistrar.addActionListener(this::registroAction);
         contentPane.add(btnRegistrar, gbc);
 
         // Botón volver
         gbc.gridy = 8;
-        JButton btnVolver = new JButton("¿Ya tienes cuenta?");
+        btnVolver = new JButton("¿Ya tienes cuenta?");
         btnVolver.addActionListener(e -> {
             A_LoginScreen login = new A_LoginScreen();
             login.setVisible(true);
             dispose();
         });
         contentPane.add(btnVolver, gbc);
+        
+        comboIdioma = new JComboBox<>(new String[]{"Español", "English"});
+        comboIdioma.setSelectedIndex(currentLocale.getLanguage().equals("en") ? 1 : 0);
+        comboIdioma.addActionListener(e -> {
+            String seleccionado = (String) comboIdioma.getSelectedItem();
+            Locale nuevoLocale = "English".equals(seleccionado) ? new Locale("en", "US") : new Locale("es", "ES");
+            cambiarIdioma(nuevoLocale);
+        });
+
+        GridBagConstraints gbcComboIdioma = new GridBagConstraints();
+        gbcComboIdioma.gridx = 1;
+        gbcComboIdioma.gridy = 0;
+        gbcComboIdioma.anchor = GridBagConstraints.NORTHEAST;
+        gbcComboIdioma.insets = new Insets(20, 0, 0, 20);
+        contentPane.add(comboIdioma, gbcComboIdioma);
+
+        
+        actualizarTextos();
+    }
+    private void cambiarIdioma(Locale locale) {
+        this.currentLocale = locale;
+        Messages.loadLocale(locale); // Establece idioma global
+        actualizarTextos();
     }
 
+
     private void registroAction(ActionEvent e) {
+        ResourceBundle bundle = Messages.labels();
+
         String correo = correoField.getText().trim();
         String pass1 = new String(passwordField.getPassword());
         String pass2 = new String(repeatPasswordField.getPassword());
         String nombreUsuario = nombreUsuarioField.getText().trim();
 
         if (!consentimientoCheck.isSelected()) {
-            JOptionPane.showMessageDialog(null, "Debes aceptar la política de privacidad para registrarte.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.accept_policy"));
             return;
         }
 
         if (correo.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || nombreUsuario.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, rellena todos los campos.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.fill_fields"));
             return;
         }
 
         if (!pass1.equals(pass2)) {
-            JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.password_mismatch"));
             return;
         }
 
         if (pass1.length() < 6) {
-            JOptionPane.showMessageDialog(null, "La contraseña debe tener al menos 6 caracteres.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.password_short"));
             return;
         }
 
         if (!correo.contains("@") || !correo.contains(".") || correo.startsWith("@") || correo.endsWith(".")) {
-            JOptionPane.showMessageDialog(null, "Correo no válido.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.invalid_email"));
             return;
         }
 
         if (User.existeCorreo(correo)) {
-            JOptionPane.showMessageDialog(null, "El correo ya está registrado.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.email_exists"));
             return;
         }
 
         if (User.existeUsuario(nombreUsuario)) {
-            JOptionPane.showMessageDialog(null, "El nombre de usuario ya existe.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.username_exists"));
             return;
         }
 
         boolean exito = User.registrarUsuario(nombreUsuario, correo, pass1);
 
         if (exito) {
-            JOptionPane.showMessageDialog(null, "Cuenta creada correctamente.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.register_success"));
             A_LoginScreen login = new A_LoginScreen();
             login.setVisible(true);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(null, "Error en el registro.");
+            JOptionPane.showMessageDialog(null, bundle.getString("message.register_error"));
         }
     }
 
-    private void mostrarPolitica() {
-        String mensaje = "POLÍTICA DE PRIVACIDAD\r\n"
-        		+ "                -----------------------\r\n"
-        		+ "                • Obtenemos tu consentimiento antes de recopilar datos.\r\n"
-        		+ "                • Protegemos tu información con cifrado y control de acceso.\r\n"
-        		+ "                • Registramos todas las actividades de gestión de datos.\r\n"
-        		+ "                • Eliminamos los datos cuando ya no son necesarios.\r\n"
-        		+ "                • Responderemos ante cualquier brecha de seguridad.\r\n"
-        		+ "                • Puedes solicitar información o eliminación de tus datos en cualquier momento.\r\n"
-        		+ "\r\n"
-        		+ "                Al registrarte, aceptas esta política.";
+    
 
-        JTextArea textArea = new JTextArea(mensaje);
+    private void mostrarPolitica() {
+        ResourceBundle bundle = Messages.labels(); 
+
+        String titulo = bundle.getString("policy.title");
+        String contenido = bundle.getString("policy.content");
+
+        JTextArea textArea = new JTextArea(contenido);
         textArea.setWrapStyleWord(true);
         textArea.setLineWrap(true);
         textArea.setEditable(false);
         textArea.setCaretPosition(0);
+
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(400, 250));
 
-        JOptionPane.showMessageDialog(this, scrollPane, "Política de Privacidad", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, scrollPane, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
+
+    
+    private void actualizarTextos() {
+        ResourceBundle bundle = Messages.labels();
+        lblRegistro.setText(bundle.getString("register.title"));
+        lblNombreUsuario.setText(bundle.getString("register.username"));
+        lblCorreo.setText(bundle.getString("register.email"));
+        lblContrasena.setText(bundle.getString("register.password"));
+        lblRepetir.setText(bundle.getString("register.repeat_password"));
+        consentimientoCheck.setText(bundle.getString("register.consent"));
+        btnPolitica.setText(bundle.getString("register.view_policy"));
+        btnRegistrar.setText(bundle.getString("register.button_register"));
+        btnVolver.setText(bundle.getString("register.button_back"));
+    }
+
 }
