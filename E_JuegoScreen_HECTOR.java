@@ -415,13 +415,13 @@ public class E_JuegoScreen extends JFrame {
     
     //Cuando se pierde se guarda en usuariodao y resetea racha a 0
     private void finalizarPartidaPerdida() {
-        System.out.println("Finalizando partida para: " + usuarioActual + ", racha: " + rachaPalabras);
+        
 
         if (usuarioActual != null) {
             try {
                 UsuarioDAO dao = new UsuarioDAO();
                 dao.actualizarPartidasJugadas(usuarioActual);
-                dao.actualizarRachaVictorias(usuarioActual, -rachaPalabras);  
+                dao.actualizarRachaVictorias(usuarioActual, rachaPalabras);
                 dao.cerrar();
             } catch (SQLException e) {
                 e.printStackTrace();
