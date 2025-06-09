@@ -31,14 +31,16 @@ public class UsuarioDAO {
         }
     }
 
-    public void actualizarRachaVictorias(String nombreUsuario, int racha) throws SQLException {
-        String sql = "UPDATE Usuarios SET racha_victorias = ? WHERE nombre_usuario = ?";
+    public void actualizarRachaVictorias(String nombreUsuario, int nuevaRacha) throws SQLException {
+        String sql = "UPDATE Usuarios SET racha_victorias = ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE nombre_usuario = ?";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
-            stmt.setInt(1, racha);
+            stmt.setInt(1, nuevaRacha);
             stmt.setString(2, nombreUsuario);
             stmt.executeUpdate();
         }
     }
+
+
 
     public void actualizarPuntuacion(String nombreUsuario, int puntos) throws SQLException {
         String sql = "UPDATE Usuarios SET puntuacion = puntuacion + ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE nombre_usuario = ?";
@@ -63,8 +65,23 @@ public class UsuarioDAO {
     }
     
     
+    public int obtenerRachaVictorias(String nombreUsuario) throws SQLException {
+        String sql = "SELECT racha_victorias FROM Usuarios WHERE nombre_usuario = ?";
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, nombreUsuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("racha_victorias");
+                }
+            }
+        }
+        return 0;
+    }
+
+    
+    
     public void resetearEstadisticas(String nombreUsuario) {
-        String sql = "UPDATE Usuarios SET racha_victorias = 0, puntuacion = 0 WHERE nombre_usuario = ?";
+        String sql = "UPDATE Usuarios SET puntuacion = 0 WHERE nombre_usuario = ?";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
             stmt.setString(1, nombreUsuario);
             stmt.executeUpdate();
@@ -72,6 +89,7 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
     }
+
 
 
 
